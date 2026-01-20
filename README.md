@@ -6,8 +6,7 @@ A Java repository for learning and practicing Data Structures and Algorithms (DS
 
 This roadmap provides a step-by-step guide to mastering Data Structures and Algorithms. Follow this order for systematic learning.
 
-### **Phase 1: Foundations** 🏗️
-
+### **Phase 1: Foundations** 
 #### 1.1 Programming Basics
 - [ ] Variables, Data Types, Operators
 - [ ] Control Flow (if-else, loops, switch)
