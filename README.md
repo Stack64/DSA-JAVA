@@ -1,334 +1,163 @@
-# DSA-JAVA
+# 50-Day FAANG Plan 
 
-A Java repository for learning and practicing Data Structures and Algorithms (DSA).
+A self-contained, interactive study plan for FAANG-level software engineering interviews. Everything lives in a single HTML file — no build step, no dependencies, no server required.
 
-## 📚 DSA Learning Roadmap
-
-This roadmap provides a step-by-step guide to mastering Data Structures and Algorithms. Follow this order for systematic learning.
-
-### **Phase 1: Foundations** 
-#### 1.1 Programming Basics
-- [ ] Variables, Data Types, Operators
-- [ ] Control Flow (if-else, loops, switch)
-- [ ] Functions/Methods
-- [ ] Recursion Basics
-- [ ] Time and Space Complexity (Big O Notation)
-
-#### 1.2 Arrays
-- [ ] Array Declaration and Initialization
-- [ ] Array Traversal
-- [ ] Searching in Arrays (Linear, Binary Search)
-- [ ] Sorting Algorithms (Bubble, Selection, Insertion)
-- [ ] Two Pointers Technique
-- [ ] Sliding Window Technique
-- [ ] Array Manipulation Problems
+**[Open the plan →](50-day-plan.html)**
 
 ---
 
-### **Phase 2: Data Structures** 📦
+## Overview
 
-#### 2.1 Strings
-- [ ] String Basics and Operations
-- [ ] String Manipulation
-- [ ] Pattern Matching
-- [ ] String Algorithms (KMP, Rabin-Karp)
+This is a structured **50-day curriculum** (~3 hours/day) covering:
 
-#### 2.2 Linked Lists
-- [ ] Singly Linked List
-- [ ] Doubly Linked List
-- [ ] Circular Linked List
-- [ ] Linked List Operations (Insert, Delete, Search)
-- [ ] Reverse Linked List
-- [ ] Detect Cycle in Linked List
-- [ ] Merge Two Sorted Lists
+| Area | Coverage |
+|------|----------|
+| **Language** | Java — LeetCode, concurrency, Spring Boot, JDBC/JPA |
+| **DSA** | ~240 LeetCode problems · 55 patterns with Java snippets |
+| **System Design** | 20 backend patterns · 6 FAANG-specific HLD cases |
+| **SQL / DBMS** | 50+ SQL problems · JDBC, indexing, normalization |
+| **Companies** | Meta · Amazon · Apple · Netflix · Google roadmaps |
+| **Interview Q&A** | 62 oral questions (Java, DSA, Spring, JVM, SD) |
 
-#### 2.3 Stacks
-- [ ] Stack Implementation (Array & Linked List)
-- [ ] Stack Operations (Push, Pop, Peek)
-- [ ] Applications: Expression Evaluation
-- [ ] Valid Parentheses
-- [ ] Next Greater Element
-- [ ] Monotonic Stack
-
-#### 2.4 Queues
-- [ ] Queue Implementation (Array & Linked List)
-- [ ] Queue Operations (Enqueue, Dequeue)
-- [ ] Circular Queue
-- [ ] Priority Queue
-- [ ] Deque (Double-ended Queue)
-- [ ] BFS (Breadth-First Search) using Queue
-
-#### 2.5 Hash Tables / HashMaps
-- [ ] Hash Table Basics
-- [ ] Hash Functions
-- [ ] Collision Handling (Chaining, Open Addressing)
-- [ ] HashMap Operations
-- [ ] HashSet Operations
-- [ ] Two Sum Problem
-- [ ] Frequency Counting
+Target level: **L3 / E3 / SDE1** and equivalent mid-level backend roles.
 
 ---
 
-### **Phase 3: Advanced Data Structures** 🚀
+## Quick Start
 
-#### 3.1 Trees
-- [ ] Binary Tree Basics
-- [ ] Tree Traversals (Inorder, Preorder, Postorder, Level-order)
-- [ ] Binary Search Tree (BST)
-- [ ] BST Operations (Insert, Delete, Search)
-- [ ] Balanced BST (AVL Tree)
-- [ ] Red-Black Tree (Overview)
-- [ ] Tree Problems (Height, Diameter, LCA)
+### Local
 
-#### 3.2 Heaps
-- [ ] Heap Basics (Min Heap, Max Heap)
-- [ ] Heap Implementation
-- [ ] Heap Operations (Insert, Delete, Heapify)
-- [ ] Priority Queue using Heap
-- [ ] Kth Largest/Smallest Element
-- [ ] Merge K Sorted Lists
+1. Clone or download this repository.
+2. Open `50-day-plan.html` in any modern browser (Chrome, Firefox, Safari, Edge).
 
-#### 3.3 Graphs
-- [ ] Graph Representation (Adjacency List, Matrix)
-- [ ] Graph Traversals (DFS, BFS)
-- [ ] Shortest Path Algorithms (Dijkstra, Bellman-Ford)
-- [ ] Minimum Spanning Tree (Kruskal, Prim)
-- [ ] Topological Sorting
-- [ ] Cycle Detection
-- [ ] Strongly Connected Components
-
-#### 3.4 Tries
-- [ ] Trie Data Structure
-- [ ] Trie Operations (Insert, Search, Delete)
-- [ ] Prefix Matching
-- [ ] Longest Common Prefix
-
----
-
-### **Phase 4: Advanced Algorithms** 🧠
-
-#### 4.1 Sorting Algorithms
-- [ ] Merge Sort
-- [ ] Quick Sort
-- [ ] Heap Sort
-- [ ] Counting Sort
-- [ ] Radix Sort
-- [ ] Comparison of Sorting Algorithms
-
-#### 4.2 Searching Algorithms
-- [ ] Binary Search (Variations)
-- [ ] Ternary Search
-- [ ] Exponential Search
-- [ ] Interpolation Search
-
-#### 4.3 Dynamic Programming
-- [ ] DP Basics and Memoization
-- [ ] Tabulation vs Memoization
-- [ ] 1D DP Problems (Fibonacci, Climbing Stairs)
-- [ ] 2D DP Problems (Grid Problems, LCS, LIS)
-- [ ] Knapsack Problems (0/1, Unbounded, Fractional)
-- [ ] DP on Strings
-- [ ] DP on Trees
-- [ ] State Space Reduction
-
-#### 4.4 Greedy Algorithms
-- [ ] Greedy Strategy
-- [ ] Activity Selection Problem
-- [ ] Fractional Knapsack
-- [ ] Huffman Coding
-- [ ] Minimum Spanning Tree (Greedy Approach)
-- [ ] Job Sequencing Problem
-
-#### 4.5 Backtracking
-- [ ] Backtracking Basics
-- [ ] N-Queens Problem
-- [ ] Sudoku Solver
-- [ ] Subset Generation
-- [ ] Permutations and Combinations
-- [ ] Rat in a Maze
-
-#### 4.6 Divide and Conquer
-- [ ] Divide and Conquer Strategy
-- [ ] Merge Sort (D&C)
-- [ ] Quick Sort (D&C)
-- [ ] Binary Search (D&C)
-- [ ] Closest Pair of Points
-- [ ] Strassen's Matrix Multiplication
-
----
-
-### **Phase 5: Advanced Topics** 🎯
-
-#### 5.1 Bit Manipulation
-- [ ] Bitwise Operators
-- [ ] Common Bit Operations
-- [ ] Bit Masking
-- [ ] Power of 2, Set Bits
-- [ ] XOR Properties
-
-#### 5.2 Sliding Window
-- [ ] Fixed Size Window
-- [ ] Variable Size Window
-- [ ] Maximum/Minimum in Window
-- [ ] Substring Problems
-
-#### 5.3 Two Pointers
-- [ ] Two Pointers Technique
-- [ ] Three Pointers
-- [ ] Fast and Slow Pointers
-- [ ] Meeting Point Problems
-
-#### 5.4 Segment Trees
-- [ ] Segment Tree Basics
-- [ ] Range Sum Query
-- [ ] Range Minimum Query
-- [ ] Lazy Propagation
-
-#### 5.5 Disjoint Set Union (DSU)
-- [ ] Union-Find Data Structure
-- [ ] Path Compression
-- [ ] Union by Rank
-- [ ] Applications
-
----
-
-### **Phase 6: Problem Solving & Practice** 💪
-
-#### 6.1 Problem Patterns
-- [ ] Array Problems
-- [ ] String Problems
-- [ ] Tree Problems
-- [ ] Graph Problems
-- [ ] Dynamic Programming Patterns
-- [ ] Greedy Problems
-
-#### 6.2 Competitive Programming
-- [ ] Time Complexity Analysis
-- [ ] Space Optimization
-- [ ] Edge Cases Handling
-- [ ] Code Optimization Techniques
-
-#### 6.3 Practice Platforms
-- [ ] LeetCode
-- [ ] HackerRank
-- [ ] Codeforces
-- [ ] GeeksforGeeks
-- [ ] InterviewBit
-
----
-
-## 📊 Progress Tracking
-
-Track your progress by checking off topics as you complete them. Aim to:
-- ✅ Understand the concept
-- ✅ Implement from scratch
-- ✅ Solve 5-10 problems per topic
-- ✅ Explain to someone else (Feynman Technique)
-
----
-
-## Project Structure
-
-The repository is organized by topics following the DSA roadmap. As you progress, new folders will be added for each topic.
-
-```
-DSA-JAVA/
-├── Collections/
-│   └── ArrayList/
-│       ├── A1.java    # Basic ArrayList operations
-│       └── A2.java    # Advanced ArrayList operations
-├── Arrays/
-├── Strings/
-├── LinkedLists/
-├── Stacks/
-├── Queues/
-├── HashTables/
-├── Trees/
-├── Graphs/
-├── Sorting/
-├── Searching/
-├── DynamicProgramming/
-├── Greedy/
-├── Backtracking/
-└── README.md
-```
-
-**Note:** Folders will be created as you progress through the roadmap. Start with the topics in Phase 1 and work your way up!
-
-## Collections
-
-### ArrayList
-
-The `ArrayList` folder contains examples demonstrating various operations with Java's ArrayList collection.
-
-#### A1.java
-Basic ArrayList example that demonstrates:
-- Creating an ArrayList
-- Adding elements
-- Iterating through elements using enhanced for-loop
-
-**To compile and run:**
 ```bash
-cd Collections/ArrayList
-javac A1.java
-java A1
+# macOS
+open 50-day-plan.html
+
+# Linux
+xdg-open 50-day-plan.html
+
+# Windows
+start 50-day-plan.html
+```
+---
+
+## Daily Schedule (3 hours)
+
+| Block | Time | Focus |
+|-------|------|-------|
+| Learn | 60 min | Java / JVM / Spring concepts |
+| Code | 90 min | LeetCode + small projects (Java only) |
+| Log | 15 min | Pattern recognition + mistake log |
+| Review | 15 min | Spaced repetition of weak areas |
+
+---
+
+## 8-Week Curriculum
+
+| Week | Days | Phase |
+|------|------|-------|
+| **1** | 1–7 | Java foundation — OOP, Collections, Streams, early DSA |
+| **2** | 8–14 | DSA in Java I — linked lists, stacks, queues, sliding window |
+| **3** | 15–21 | Trees & graphs — BFS, DFS, topological sort |
+| **4** | 22–28 | DP & backtracking — memoization, tabulation |
+| **5** | 29–35 | Java expert — concurrency, Spring Boot, SQL sprint (Day 34) |
+| **6** | 36–42 | FAANG system design — Search, Feed, Checkout, Streaming, iCloud |
+| **7** | 43–49 | Company sprints — one FAANG company per day + OA marathon |
+| **8** | 50 | FAANG graduation — full loop mock (code + SQL + SD + behavioral) |
+
+### Timeline at a Glance
+
+```
+Days  1–7    100% Java boot — OOP · Collections · Streams
+Days  8–28   All DSA in Java — ListNode · ArrayDeque · HashMap
+Days 29–35  Java Expert + SQL (Day 34) → Backend + SD data layer
+Days 36–42  FAANG SD + database design → Schema in every HLD
+Days 43–49  FAANG Company Sprint → Meta · AMZ · Apple · NFLX · GOOG
+Day   50    FAANG Graduation Loop → Full interview simulation
 ```
 
-#### A2.java
-Advanced ArrayList example that demonstrates:
-- Adding elements at specific indices
-- Removing elements by index and by value
-- Updating elements using `set()` method
+---
 
-**To compile and run:**
-```bash
-cd Collections/ArrayList
-javac A2.java
-java A2
-```
+## What's Inside the Page
 
-## Prerequisites
+### Weekly day cards
+Each day includes learn/drill blocks, linked LeetCode problems, SQL tasks where relevant, and a clear **exit criteria** checklist. Mark days complete to track progress.
 
-- Java Development Kit (JDK) 8 or higher
-- A terminal/command prompt
+### FAANG company roadmaps
+Per-company breakdowns for all five companies:
+- Interview process and online assessment format
+- DSA / Java / SD / behavioral priority ratings
+- Must-do problem lists (with LeetCode links)
+- Leadership principle / behavioral prompts
+- Mapping to specific plan days
 
-## How to Compile and Run
+### DSA patterns (55)
+Searchable pattern library with:
+- Trigger phrases (“when you see this in a problem…”)
+- Time/space complexity
+- Copy-ready **Java** code templates
+- Linked practice problems
 
-1. Navigate to the directory containing the Java file:
-   ```bash
-   cd Collections/ArrayList
-   ```
+### System design patterns (20)
+Spring Boot–oriented backend patterns (caching, Kafka, sharding, rate limiting, etc.) plus a 45-minute HLD interview framework.
 
-2. Compile the Java file:
-   ```bash
-   javac A2.java
-   ```
+### DBMS & SQL
+Normalization, ACID, indexing, SQL vs NoSQL trade-offs, JDBC/JPA notes, and 25+ SQL pattern references.
 
-3. Run the compiled class:
-   ```bash
-   java A2
-   ```
+### Interview Q&A (62)
+Oral-prep questions grouped by topic: production “why” questions, core Java, DSA, Web/Spring, system design, and JVM/server internals.
 
-**Note:** Make sure you're in the correct directory when compiling. The error `file not found` occurs when you try to compile from a different directory than where the `.java` file is located.
+### Quick reference
+Java collections cheat sheet, pattern recognition flowchart, Day 50 graduation checklist, and SQL quick reference — all on one scrollable page.
 
-## Common Issues
+---
 
-### File Not Found Error
-If you encounter `error: file not found: A2.java`, make sure you're in the correct directory:
-- The file is located at: `Collections/ArrayList/A2.java`
-- You should be in: `Collections/ArrayList/` directory when compiling
+## Features
 
-### ClassNotFoundException
-If you get `ClassNotFoundException`, ensure:
-- The file has been compiled first using `javac`
-- You're running `java` (not `java A2.java`)
-- You're in the correct directory
+- **Progress tracking** — Check off completed days; progress is saved in `localStorage` (`expert50day_progress`).
+- **Sidebar navigation** — Jump to any week, company, or resource section.
+- **Expand / collapse** — Toolbar buttons to expand all days, companies, patterns, or interview Q&A at once.
+- **Search** — Filter DSA and system design patterns by keyword.
+- **Mobile-friendly** — Responsive layout with a slide-out navigation menu on small screens.
+- **Dark theme** — Easy on the eyes for long study sessions.
+- **Zero dependencies** — Single HTML file with embedded CSS and JavaScript.
 
-## Contributing
+---
 
-This is a learning repository. Feel free to add more examples and implementations!
+## How to Use Effectively
+
+1. **Start at Day 1** and follow the sequence — later weeks assume earlier Java and DSA foundations.
+2. **Solve every problem in Java** on LeetCode (set language to Java before you start).
+3. **Use the pattern sections** when stuck — match trigger phrases to the right template.
+4. **Check exit criteria** at the end of each day before moving on.
+5. **Week 7** — pick your target company and lean into that day's sprint.
+6. **Day 50** — run the full 3-hour mock loop solo; use the graduation checklist in Quick Reference.
+
+---
+
+## Browser Support
+
+Works in all modern browsers. Progress persistence requires JavaScript and `localStorage` enabled.
+
+To reset progress, use the **Reset Progress** button in the page header (clears saved day completions).
+
+---
+
+## File
+
+| File | Description |
+|------|-------------|
+| `50-day-plan.html` | Complete interactive plan (~3,000 lines, self-contained) |
+
+No other files are required to run the plan.
+
+---
 
 ## License
 
-This project is for educational purposes.
+Free to use for personal interview preparation. If you fork or share, attribution is appreciated.
 
+---
+
+**Good luck with your FAANG prep. See you on Day 50.**
