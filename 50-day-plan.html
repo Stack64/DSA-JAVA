@@ -1,0 +1,3079 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>50-Day FAANG Plan — 100% Java</title>
+  <style>
+    :root {
+      --bg: #0f1419;
+      --surface: #1a2332;
+      --surface2: #243044;
+      --border: #2d3a4f;
+      --text: #e7ecf3;
+      --muted: #8b9cb3;
+      --accent: #3b82f6;
+      --accent2: #6366f1;
+      --green: #22c55e;
+      --orange: #f59e0b;
+      --red: #ef4444;
+      --radius: 12px;
+      --shadow: 0 4px 24px rgba(0, 0, 0, 0.35);
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: "Segoe UI", system-ui, -apple-system, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.6;
+      min-height: 100vh;
+    }
+
+    .hero {
+      background: linear-gradient(135deg, #1e3a5f 0%, #312e81 50%, #1a2332 100%);
+      padding: 2.5rem 1.5rem 2rem;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .hero-inner { max-width: 1100px; margin: 0 auto; }
+
+    .hero h1 {
+      font-size: clamp(1.75rem, 4vw, 2.5rem);
+      font-weight: 700;
+      letter-spacing: -0.02em;
+      margin-bottom: 0.5rem;
+    }
+
+    .hero p { color: #b8c5d9; max-width: 640px; font-size: 1.05rem; }
+
+    .stats {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 1rem;
+      margin-top: 1.5rem;
+    }
+
+    .stat {
+      background: rgba(255, 255, 255, 0.08);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      border-radius: var(--radius);
+      padding: 0.75rem 1.25rem;
+      min-width: 120px;
+    }
+
+    .stat-value { font-size: 1.5rem; font-weight: 700; color: #fff; }
+    .stat-label { font-size: 0.8rem; color: #94a3b8; text-transform: uppercase; letter-spacing: 0.05em; }
+
+    .progress-wrap {
+      margin-top: 1.25rem;
+      max-width: 500px;
+    }
+
+    .progress-bar {
+      height: 10px;
+      background: rgba(255, 255, 255, 0.15);
+      border-radius: 99px;
+      overflow: hidden;
+    }
+
+    .progress-fill {
+      height: 100%;
+      background: linear-gradient(90deg, var(--accent), var(--green));
+      border-radius: 99px;
+      width: 0%;
+      transition: width 0.4s ease;
+    }
+
+    .progress-text { font-size: 0.85rem; color: #94a3b8; margin-top: 0.4rem; }
+
+    .layout {
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 1.5rem;
+      display: grid;
+      grid-template-columns: 220px 1fr;
+      gap: 1.5rem;
+      align-items: start;
+    }
+
+    html {
+      scroll-behavior: smooth;
+      -webkit-text-size-adjust: 100%;
+    }
+
+    body {
+      overflow-x: hidden;
+    }
+
+    body.nav-open { overflow: hidden; }
+
+    /* Mobile nav toggle — hidden on desktop */
+    .nav-toggle {
+      display: none;
+      align-items: center;
+      gap: 0.5rem;
+      position: fixed;
+      top: 0.75rem;
+      right: 0.75rem;
+      z-index: 1100;
+      padding: 0.55rem 0.85rem;
+      min-height: 44px;
+      border-radius: 10px;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      background: rgba(26, 35, 50, 0.95);
+      color: #fff;
+      font-size: 0.85rem;
+      font-weight: 600;
+      cursor: pointer;
+      backdrop-filter: blur(8px);
+      box-shadow: var(--shadow);
+    }
+
+    .nav-toggle-icon {
+      width: 18px;
+      height: 2px;
+      background: currentColor;
+      position: relative;
+      display: block;
+    }
+
+    .nav-toggle-icon::before,
+    .nav-toggle-icon::after {
+      content: "";
+      position: absolute;
+      left: 0;
+      width: 18px;
+      height: 2px;
+      background: currentColor;
+      transition: transform 0.2s;
+    }
+
+    .nav-toggle-icon::before { top: -6px; }
+    .nav-toggle-icon::after { top: 6px; }
+
+    body.nav-open .nav-toggle-icon { background: transparent; }
+    body.nav-open .nav-toggle-icon::before { top: 0; transform: rotate(45deg); }
+    body.nav-open .nav-toggle-icon::after { top: 0; transform: rotate(-45deg); }
+
+    .sidebar-backdrop {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.55);
+      z-index: 999;
+      opacity: 0;
+      transition: opacity 0.25s ease;
+    }
+
+    .sidebar-backdrop.open {
+      display: block;
+      opacity: 1;
+    }
+
+    .sidebar {
+      position: sticky;
+      top: 1rem;
+      max-height: calc(100dvh - 2rem);
+      overflow-y: auto;
+      overscroll-behavior: contain;
+      -webkit-overflow-scrolling: touch;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 1rem;
+      box-shadow: var(--shadow);
+    }
+
+    .sidebar h3 {
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--muted);
+      margin-bottom: 0.75rem;
+      margin-top: 0.25rem;
+    }
+
+    .sidebar h3:first-child { margin-top: 0; }
+
+    .nav-link {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto;
+      align-items: center;
+      gap: 0.35rem 0.5rem;
+      padding: 0.5rem 0.75rem;
+      color: var(--muted);
+      text-decoration: none;
+      border-radius: 8px;
+      font-size: 0.9rem;
+      line-height: 1.35;
+      margin-bottom: 2px;
+      transition: background 0.15s, color 0.15s;
+    }
+
+    .nav-link:hover { background: var(--surface2); color: var(--text); }
+    .nav-link.active { background: var(--accent); color: #fff; }
+
+    .week-badge {
+      grid-column: 2;
+      grid-row: 1;
+      float: none;
+      font-size: 0.68rem;
+      font-variant-numeric: tabular-nums;
+      background: var(--surface2);
+      padding: 0.15rem 0.45rem;
+      border-radius: 4px;
+      min-width: 2.1rem;
+      text-align: center;
+      white-space: nowrap;
+      line-height: 1.25;
+      align-self: center;
+    }
+
+    .nav-link.active .week-badge { background: rgba(255,255,255,0.2); }
+
+    .nav-link-text {
+      grid-column: 1;
+      min-width: 0;
+      word-wrap: break-word;
+      overflow-wrap: anywhere;
+    }
+
+    .nav-link:not(:has(.week-badge)) {
+      grid-template-columns: 1fr;
+    }
+
+    .content section {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 1.5rem;
+      margin-bottom: 1.5rem;
+      box-shadow: var(--shadow);
+    }
+
+    .week-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 0.75rem;
+      margin-bottom: 1.25rem;
+      padding-bottom: 1rem;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .week-header h2 {
+      font-size: 1.35rem;
+      color: #fff;
+    }
+
+    .phase-tag {
+      font-size: 0.8rem;
+      padding: 0.35rem 0.75rem;
+      border-radius: 99px;
+      background: var(--surface2);
+      color: var(--accent);
+      border: 1px solid var(--border);
+    }
+
+    .day-card {
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      margin-bottom: 1rem;
+      overflow: hidden;
+      transition: border-color 0.2s;
+    }
+
+    .day-card.done { border-color: var(--green); opacity: 0.85; }
+    .day-card.done .day-title { text-decoration: line-through; color: var(--muted); }
+
+    .day-header {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      padding: 1rem 1.25rem;
+      cursor: pointer;
+      user-select: none;
+    }
+
+    .day-header:hover { background: var(--surface2); }
+
+    .day-check {
+      width: 22px;
+      height: 22px;
+      accent-color: var(--green);
+      cursor: pointer;
+      flex-shrink: 0;
+    }
+
+    .day-num {
+      font-size: 0.75rem;
+      font-weight: 700;
+      color: var(--accent);
+      background: rgba(59, 130, 246, 0.15);
+      padding: 0.2rem 0.5rem;
+      border-radius: 6px;
+      min-width: 52px;
+      text-align: center;
+    }
+
+    .day-title { font-weight: 600; flex: 1; }
+
+    .chevron {
+      color: var(--muted);
+      transition: transform 0.2s;
+      font-size: 0.8rem;
+    }
+
+    .day-card.open .chevron { transform: rotate(180deg); }
+
+    .day-body {
+      display: none;
+      padding: 0 1.25rem 1.25rem;
+      border-top: 1px solid var(--border);
+    }
+
+    .day-card.open .day-body { display: block; padding-top: 1rem; }
+
+    .block {
+      margin-bottom: 1rem;
+    }
+
+    .block-label {
+      font-size: 0.7rem;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: var(--orange);
+      font-weight: 600;
+      margin-bottom: 0.35rem;
+    }
+
+    .block-label.learn { color: #a78bfa; }
+    .block-label.java { color: #fbbf24; }
+    .block-label.sd { color: #34d399; }
+    .block-label.sql { color: #2dd4bf; }
+    .block-label.dbms { color: #818cf8; }
+    .block-label.solve { color: #38bdf8; }
+    .block-label.drill { color: #f472b6; }
+    .block-label.exit { color: var(--green); }
+
+    .track-badge {
+      font-size: 0.65rem;
+      padding: 0.15rem 0.45rem;
+      border-radius: 4px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      flex-shrink: 0;
+    }
+    .track-java { background: rgba(251,191,36,0.15); color: #fbbf24; }
+    .track-dsa { background: rgba(59,130,246,0.15); color: #60a5fa; }
+    .track-sd { background: rgba(52,211,153,0.15); color: #34d399; }
+    .track-mix { background: rgba(167,139,250,0.15); color: #a78bfa; }
+    .track-sql { background: rgba(45,212,191,0.15); color: #2dd4bf; }
+    .track-faang { background: rgba(6,104,225,0.18); color: #60a5fa; font-size: 0.62rem; max-width: 72px; text-align: center; line-height: 1.2; }
+
+    .problem.sql-link { color: #5eead4; border-color: rgba(45,212,191,0.35); }
+    .problem.sql-link:hover { background: rgba(45,212,191,0.15); border-color: #2dd4bf; }
+
+    .iq-card.open .pattern-body { display: block; padding-top: 1rem; }
+    .iq-answer { font-size: 0.88rem; color: #c8d3e0; line-height: 1.65; word-wrap: break-word; overflow-wrap: anywhere; }
+    .iq-answer ul { margin: 0.5rem 0 0 1.1rem; padding-right: 0.5rem; }
+    .iq-answer li { margin-bottom: 0.3rem; }
+    .iq-answer code { word-break: break-all; }
+
+    .iq-card .pattern-name {
+      word-wrap: break-word;
+      overflow-wrap: anywhere;
+      line-height: 1.45;
+    }
+
+    .iq-card .pattern-header {
+      align-items: flex-start;
+      min-height: 44px;
+    }
+
+    .hour-block {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+      gap: 0.5rem;
+      margin: 1rem 0 1.25rem;
+    }
+    .hour-item {
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 0.5rem 0.75rem;
+      font-size: 0.8rem;
+    }
+    .hour-item strong { color: var(--accent); display: block; font-size: 0.72rem; }
+
+    .block p, .block ul { font-size: 0.92rem; color: #c8d3e0; }
+
+    .block ul { padding-left: 1.25rem; margin-top: 0.35rem; }
+
+    .block li { margin-bottom: 0.25rem; }
+
+    .problems { display: flex; flex-wrap: wrap; gap: 0.4rem; margin-top: 0.35rem; }
+
+    .problem {
+      font-size: 0.8rem;
+      padding: 0.25rem 0.6rem;
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      color: #93c5fd;
+      text-decoration: none;
+      transition: background 0.15s, border-color 0.15s;
+    }
+
+    .problem:hover {
+      background: rgba(59, 130, 246, 0.2);
+      border-color: var(--accent);
+    }
+
+    .overview-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+      gap: 0.75rem;
+      margin-top: 1rem;
+    }
+
+    .overview-item {
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 0.75rem 1rem;
+      font-size: 0.85rem;
+    }
+
+    .overview-item strong { display: block; color: var(--accent); font-size: 0.75rem; margin-bottom: 0.2rem; }
+
+    .templates {
+      background: #0d1117;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 1rem;
+      font-family: "Cascadia Code", "Fira Code", monospace;
+      font-size: clamp(0.68rem, 2.5vw, 0.78rem);
+      overflow-x: auto;
+      -webkit-overflow-scrolling: touch;
+      max-width: 100%;
+      color: #c9d1d9;
+      line-height: 1.5;
+      margin-top: 0.5rem;
+    }
+
+    .templates .kw { color: #ff7b72; }
+    .templates .cm { color: #8b949e; }
+
+    .toolbar {
+      display: flex;
+      gap: 0.5rem;
+      flex-wrap: wrap;
+      margin-top: 1rem;
+    }
+
+    .btn {
+      padding: 0.5rem 1rem;
+      border-radius: 8px;
+      border: 1px solid var(--border);
+      background: var(--surface2);
+      color: var(--text);
+      font-size: 0.85rem;
+      cursor: pointer;
+      transition: background 0.15s;
+    }
+
+    .btn:hover { background: var(--border); }
+    .btn-primary { background: var(--accent); border-color: var(--accent); color: #fff; }
+    .btn-primary:hover { background: #2563eb; }
+
+    .pattern-toolbar {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+      margin-bottom: 1.25rem;
+      align-items: center;
+    }
+
+    .pattern-search {
+      flex: 1;
+      min-width: 180px;
+      padding: 0.55rem 0.85rem;
+      border-radius: 8px;
+      border: 1px solid var(--border);
+      background: var(--bg);
+      color: var(--text);
+      font-size: 0.9rem;
+    }
+
+    .pattern-search:focus {
+      outline: none;
+      border-color: var(--accent);
+    }
+
+    .cat-chip {
+      padding: 0.35rem 0.75rem;
+      border-radius: 99px;
+      border: 1px solid var(--border);
+      background: var(--bg);
+      color: var(--muted);
+      font-size: 0.78rem;
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+
+    .cat-chip:hover { border-color: var(--accent); color: var(--text); }
+    .cat-chip.active { background: var(--accent); border-color: var(--accent); color: #fff; }
+
+    .pattern-category { margin-bottom: 1.75rem; }
+
+    .pattern-category h3 {
+      font-size: 1rem;
+      color: #a78bfa;
+      margin-bottom: 0.75rem;
+      padding-bottom: 0.5rem;
+      border-bottom: 1px dashed var(--border);
+    }
+
+    .pattern-card {
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      margin-bottom: 0.75rem;
+      overflow: hidden;
+    }
+
+    .pattern-card.hidden { display: none; }
+
+    .pattern-header {
+      display: flex;
+      align-items: flex-start;
+      gap: 0.75rem;
+      padding: 1rem 1.25rem;
+      cursor: pointer;
+      user-select: none;
+    }
+
+    .pattern-header:hover { background: var(--surface2); }
+
+    .pattern-num {
+      font-size: 0.7rem;
+      font-weight: 700;
+      color: var(--orange);
+      background: rgba(245, 158, 11, 0.12);
+      padding: 0.2rem 0.45rem;
+      border-radius: 6px;
+      flex-shrink: 0;
+    }
+
+    .pattern-meta { flex: 1; }
+
+    .pattern-name { font-weight: 600; font-size: 0.95rem; margin-bottom: 0.2rem; }
+
+    .pattern-trigger {
+      font-size: 0.82rem;
+      color: var(--muted);
+      font-style: italic;
+    }
+
+    .complexity-badge {
+      font-size: 0.72rem;
+      padding: 0.15rem 0.5rem;
+      border-radius: 4px;
+      background: var(--surface2);
+      color: #86efac;
+      white-space: nowrap;
+    }
+
+    .pattern-body {
+      display: none;
+      padding: 0 1.25rem 1.25rem;
+      border-top: 1px solid var(--border);
+    }
+
+    .pattern-card.open .pattern-body { display: block; padding-top: 1rem; }
+    .pattern-card.open .chevron { transform: rotate(180deg); }
+
+    .pattern-when {
+      font-size: 0.88rem;
+      color: #c8d3e0;
+      margin-bottom: 0.75rem;
+    }
+
+    .pattern-when strong { color: var(--accent); font-size: 0.75rem; text-transform: uppercase; }
+
+    .code-label {
+      font-size: 0.7rem;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: #f472b6;
+      margin-bottom: 0.35rem;
+    }
+
+    .company-grid { display: flex; flex-direction: column; gap: 1rem; }
+
+    .company-card {
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      overflow: hidden;
+      border-left: 4px solid var(--company-color, var(--accent));
+    }
+
+    .company-card.open .company-body { display: block; }
+    .company-card.open .chevron { transform: rotate(180deg); }
+
+    .company-header {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      padding: 1rem 1.25rem;
+      cursor: pointer;
+      user-select: none;
+    }
+
+    .company-header:hover { background: var(--surface2); }
+
+    .company-logo {
+      width: 40px;
+      height: 40px;
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 800;
+      font-size: 0.85rem;
+      flex-shrink: 0;
+      background: var(--surface2);
+      color: var(--company-color, var(--accent));
+      border: 1px solid var(--border);
+    }
+
+    .company-title { font-weight: 700; font-size: 1.05rem; }
+    .company-sub { font-size: 0.8rem; color: var(--muted); }
+
+    .company-body {
+      display: none;
+      padding: 1rem 1.25rem 1.25rem;
+      border-top: 1px solid var(--border);
+    }
+
+    .company-meta {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(155px, 1fr));
+      gap: 0.5rem;
+      margin-bottom: 1rem;
+    }
+
+    .meta-pill {
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 0.5rem 0.65rem;
+      font-size: 0.78rem;
+    }
+
+    .meta-pill strong {
+      display: block;
+      font-size: 0.65rem;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin-bottom: 0.15rem;
+    }
+
+    .priority-bar { display: flex; gap: 0.35rem; margin-top: 0.35rem; }
+    .priority-dot { height: 6px; flex: 1; border-radius: 3px; background: var(--border); }
+    .priority-dot.on { background: var(--company-color, var(--accent)); }
+
+    .company-section-title {
+      font-size: 0.72rem;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: var(--orange);
+      font-weight: 600;
+      margin: 1rem 0 0.4rem;
+    }
+
+    .company-section-title:first-child { margin-top: 0; }
+
+    .lp-list { list-style: none; padding: 0; }
+    .lp-list li {
+      font-size: 0.85rem;
+      color: #c8d3e0;
+      padding: 0.35rem 0;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .lp-list li:last-child { border-bottom: none; }
+
+    .sidebar-divider {
+      height: 1px;
+      background: var(--border);
+      margin: 0.75rem 0;
+    }
+
+    .java-banner {
+      background: rgba(251, 191, 36, 0.12);
+      border: 1px solid rgba(251, 191, 36, 0.35);
+      border-radius: var(--radius);
+      padding: 0.85rem 1.1rem;
+      margin-bottom: 1rem;
+      font-size: 0.9rem;
+      color: #fde68a;
+    }
+
+    .java-banner strong { color: #fbbf24; }
+
+    footer {
+      text-align: center;
+      padding: 2rem;
+      color: var(--muted);
+      font-size: 0.85rem;
+    }
+
+    /* ── Tablet (768px – 1024px) ── */
+    @media (max-width: 1024px) {
+      .layout {
+        grid-template-columns: 200px 1fr;
+        gap: 1.25rem;
+        padding: 1.25rem;
+      }
+
+      .hero { padding: 2rem 1.25rem 1.75rem; }
+      .week-header h2 { font-size: 1.2rem; }
+      .pattern-header { padding: 0.85rem 1rem; }
+      .day-header { padding: 0.85rem 1rem; }
+    }
+
+    /* ── Mobile (≤768px) ── */
+    @media (max-width: 768px) {
+      .nav-toggle { display: flex; }
+
+      .layout {
+        grid-template-columns: 1fr;
+        padding: 1rem;
+        padding-top: 3.5rem;
+      }
+
+      .sidebar {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: min(88vw, 320px);
+        height: 100vh;
+        height: 100dvh;
+        z-index: 1000;
+        transform: translateX(-105%);
+        transition: transform 0.28s ease;
+        overflow-y: auto;
+        -webkit-overflow-scrolling: touch;
+        border-radius: 0;
+        border-left: none;
+        border-top: none;
+        border-bottom: none;
+      }
+
+      .sidebar.open { transform: translateX(0); }
+
+      .hero {
+        padding: 1.25rem 1rem 1.5rem;
+        padding-right: 4.5rem;
+      }
+
+      .hero p { font-size: 0.95rem; }
+
+      .hour-block {
+        grid-template-columns: 1fr 1fr;
+        gap: 0.4rem;
+      }
+
+      .stats { gap: 0.6rem; }
+      .stat {
+        flex: 1 1 calc(50% - 0.35rem);
+        min-width: 0;
+        padding: 0.6rem 0.85rem;
+      }
+
+      .stat-value { font-size: 1.25rem; }
+
+      .toolbar { gap: 0.4rem; }
+      .toolbar .btn {
+        flex: 1 1 calc(50% - 0.25rem);
+        min-height: 44px;
+        font-size: 0.8rem;
+        padding: 0.5rem 0.65rem;
+        text-align: center;
+      }
+
+      .content section {
+        padding: 1rem;
+        margin-bottom: 1rem;
+      }
+
+      .week-header {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+
+      .phase-tag {
+        font-size: 0.72rem;
+        line-height: 1.4;
+      }
+
+      .pattern-toolbar {
+        flex-direction: column;
+        align-items: stretch;
+      }
+
+      .pattern-search {
+        min-width: 0;
+        width: 100%;
+        min-height: 44px;
+      }
+
+      .pattern-header,
+      .day-header,
+      .company-header {
+        padding: 0.85rem 1rem;
+        gap: 0.5rem;
+      }
+
+      .pattern-name,
+      .day-title {
+        font-size: 0.9rem;
+      }
+
+      .pattern-body,
+      .day-body,
+      .company-body {
+        padding-left: 1rem;
+        padding-right: 1rem;
+      }
+
+      .templates {
+        padding: 0.75rem;
+        margin-left: -0.25rem;
+        margin-right: -0.25rem;
+        border-radius: 6px;
+      }
+
+      .problems { gap: 0.35rem; }
+      .problem {
+        font-size: 0.75rem;
+        padding: 0.35rem 0.5rem;
+        max-width: 100%;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+
+      .company-meta {
+        grid-template-columns: 1fr 1fr;
+      }
+
+      .overview-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .nav-link {
+        min-height: 44px;
+      }
+    }
+
+    /* ── Small phones (≤480px) ── */
+    @media (max-width: 480px) {
+      .hero h1 { font-size: 1.5rem; }
+      .hour-block { grid-template-columns: 1fr; }
+      .stat { flex: 1 1 100%; }
+      .toolbar .btn { flex: 1 1 100%; }
+      .company-meta { grid-template-columns: 1fr; }
+      .pattern-num { font-size: 0.62rem; padding: 0.15rem 0.35rem; }
+    }
+
+    /* ── Large laptop / desktop (≥1280px) ── */
+    @media (min-width: 1280px) {
+      .layout,
+      .hero-inner {
+        max-width: 1200px;
+      }
+
+      .layout {
+        grid-template-columns: 240px 1fr;
+        gap: 2rem;
+        padding: 2rem 1.5rem;
+      }
+
+      .content section { padding: 1.75rem; }
+    }
+  </style>
+</head>
+<body>
+
+  <button type="button" class="nav-toggle" id="navToggle" aria-label="Open navigation menu" aria-expanded="false" aria-controls="sidebar">
+    <span class="nav-toggle-icon" aria-hidden="true"></span>
+    <span class="nav-toggle-label">Menu</span>
+  </button>
+  <div class="sidebar-backdrop" id="sidebarBackdrop" aria-hidden="true"></div>
+
+  <header class="hero">
+    <div class="hero-inner">
+      <h1>50-Day FAANG Plan </h1>
+      <p>Every problem, Pattern, System Design, and Interview Answers · Meta · Amazon · Apple · Netflix · Google · 3 hrs/day.</p>
+      <div class="hour-block">
+        <div class="hour-item"><strong>60 min</strong>Learn (Java / JVM / Spring)</div>
+        <div class="hour-item"><strong>90 min</strong>Code in Java (LC + projects)</div>
+        <div class="hour-item"><strong>15 min</strong>Log pattern + mistakes</div>
+        <div class="hour-item"><strong>15 min</strong>Spaced review</div>
+      </div>
+      <div class="stats">
+        <div class="stat">
+          <div class="stat-value" id="daysDone">0</div>
+          <div class="stat-label">Days Done</div>
+        </div>
+        <div class="stat">
+          <div class="stat-value">50</div>
+          <div class="stat-label">Total Days</div>
+        </div>
+        <div class="stat">
+          <div class="stat-value">~240</div>
+          <div class="stat-label">LC Problems</div>
+        </div>
+        <div class="stat">
+          <div class="stat-value">50+</div>
+          <div class="stat-label">SQL Problems</div>
+        </div>
+        <div class="stat">
+          <div class="stat-value">Java</div>
+          <div class="stat-label">Only Language</div>
+        </div>
+        <div class="stat">
+          <div class="stat-value" id="currentWeek">Week 1</div>
+          <div class="stat-label">Focus</div>
+        </div>
+      </div>
+      <div class="progress-wrap">
+        <div class="progress-bar"><div class="progress-fill" id="progressFill"></div></div>
+        <div class="progress-text"><span id="progressPct">0%</span> complete</div>
+      </div>
+      <div class="toolbar">
+        <button class="btn btn-primary" onclick="expandAll()">Expand All</button>
+        <button class="btn" onclick="collapseAll()">Collapse All</button>
+        <button class="btn" onclick="expandAllCompanies()">Expand Companies</button>
+        <button class="btn" onclick="expandAllPatterns()">Expand DSA Patterns</button>
+        <button class="btn" onclick="expandAllSd()">Expand SD Patterns</button>
+        <button class="btn" onclick="expandAllInterview()">Expand Interview Q&A</button>
+        <button class="btn" onclick="resetProgress()">Reset Progress</button>
+      </div>
+    </div>
+  </header>
+
+  <div class="layout">
+    <nav class="sidebar" id="sidebar">
+      <h3>Jump to Week</h3>
+      <a class="nav-link active" href="#week1"><span class="nav-link-text">Week 1</span><span class="week-badge" id="wb1">0/7</span></a>
+      <a class="nav-link" href="#week2"><span class="nav-link-text">Week 2</span><span class="week-badge" id="wb2">0/7</span></a>
+      <a class="nav-link" href="#week3"><span class="nav-link-text">Week 3</span><span class="week-badge" id="wb3">0/7</span></a>
+      <a class="nav-link" href="#week4"><span class="nav-link-text">Week 4</span><span class="week-badge" id="wb4">0/7</span></a>
+      <a class="nav-link" href="#week5"><span class="nav-link-text">Week 5</span><span class="week-badge" id="wb5">0/7</span></a>
+      <a class="nav-link" href="#week6"><span class="nav-link-text">Week 6 — FAANG System Design</span><span class="week-badge" id="wb6">0/7</span></a>
+      <a class="nav-link" href="#week7"><span class="nav-link-text">Week 7 — FAANG Company Sprint</span><span class="week-badge" id="wb7">0/7</span></a>
+      <a class="nav-link" href="#week8"><span class="nav-link-text">Week 8 — FAANG Graduation</span><span class="week-badge" id="wb8">0/1</span></a>
+      <div class="sidebar-divider"></div>
+      <h3>FAANG Companies</h3>
+      <a class="nav-link" href="#companies"><span class="nav-link-text">All FAANG Roadmaps</span><span class="week-badge">5</span></a>
+      <a class="nav-link" href="#companies-meta">↳ Meta</a>
+      <a class="nav-link" href="#companies-amazon">↳ Amazon</a>
+      <a class="nav-link" href="#companies-apple">↳ Apple</a>
+      <a class="nav-link" href="#companies-netflix">↳ Netflix</a>
+      <a class="nav-link" href="#companies-google">↳ Google</a>
+      <div class="sidebar-divider"></div>
+      <h3>Resources</h3>
+      <a class="nav-link" href="#java-stack"><span class="nav-link-text">Java Stack (100%)</span><span class="week-badge">Core</span></a>
+      <a class="nav-link" href="#patterns"><span class="nav-link-text">DSA Patterns (Java)</span><span class="week-badge">55</span></a>
+      <a class="nav-link" href="#sd-patterns"><span class="nav-link-text">System Design (Java BE)</span><span class="week-badge">20</span></a>
+      <a class="nav-link" href="#dbms-sql"><span class="nav-link-text">DBMS &amp; SQL (JDBC/JPA)</span><span class="week-badge">25</span></a>
+      <div class="sidebar-divider"></div>
+      <h3>Interview Q&A</h3>
+      <a class="nav-link" href="#interview-qa"><span class="nav-link-text">All Questions</span><span class="week-badge">62</span></a>
+      <a class="nav-link" href="#iq-why">↳ WHY? Production (20)</a>
+      <a class="nav-link" href="#iq-java">↳ Core Java (12)</a>
+      <a class="nav-link" href="#iq-dsa">↳ DSA / Coding (13)</a>
+      <a class="nav-link" href="#iq-web">↳ Web / Spring (8)</a>
+      <a class="nav-link" href="#iq-sd">↳ System Design (5)</a>
+      <a class="nav-link" href="#iq-server">↳ Server / JVM (4)</a>
+      <a class="nav-link" href="#reference">Quick Reference</a>
+    </nav>
+
+    <main class="content" id="plan"></main>
+  </div>
+
+  <footer>50-Day FAANG ·Java · DSA · DBMS · SQL · Spring · System Design</footer>
+
+  <script>
+    const STORAGE_KEY = "expert50day_progress";
+    const TOTAL_DAYS = 50;
+
+    const lc = (slug) => `https://leetcode.com/problems/${slug}/`;
+    const lcs = (slug) => `https://leetcode.com/problems/${slug}/`;
+
+    const patternCategories = [
+      {
+        id: "array", name: "Array & String",
+        patterns: [
+          {
+            name: "Hash Map — Frequency Count",
+            trigger: "\"how many times\", anagram, group by signature, duplicate check",
+            when: "Need O(1) lookup by key. Count chars/nums, store indices, or group items.",
+            time: "O(n)", space: "O(n)",
+            code: "Map<Integer, Integer> freq = new HashMap<>();\nfor (int x : nums) {\n    freq.merge(x, 1, Integer::sum);\n}\n// getOrDefault, containsKey, keySet()",
+            problems: [["two-sum","Two Sum"],["group-anagrams","Group Anagrams"],["top-k-frequent-elements","Top K Frequent"]]
+          },
+          {
+            name: "Hash Map — Complement / Two Sum",
+            trigger: "find pair with target sum, complement exists",
+            when: "For each element, check if (target - current) already seen.",
+            time: "O(n)", space: "O(n)",
+            code: "Map<Integer, Integer> seen = new HashMap<>();\nfor (int i = 0; i < nums.length; i++) {\n    int need = target - nums[i];\n    if (seen.containsKey(need)) return new int[]{seen.get(need), i};\n    seen.put(nums[i], i);\n}",
+            problems: [["two-sum","Two Sum"],["two-sum-iii-data-structure-design","Two Sum III"]]
+          },
+          {
+            name: "Prefix Sum",
+            trigger: "range sum query, subarray sum equals K (with hash)",
+            when: "Precompute cumulative sums. Range [l,r] sum = prefix[r+1] - prefix[l].",
+            time: "O(n) build, O(1) query", space: "O(n)",
+            code: "int[] prefix = new int[n + 1];\nfor (int i = 0; i < n; i++) prefix[i + 1] = prefix[i] + nums[i];\n// sum(l, r) = prefix[r + 1] - prefix[l]",
+            problems: [["range-sum-query-immutable","Range Sum Query"],["subarray-sum-equals-k","Subarray Sum Equals K"]]
+          },
+          {
+            name: "Difference Array",
+            trigger: "multiple range update queries on array",
+            when: "Mark start/end of ranges; final prefix sum gives result array.",
+            time: "O(n + q)", space: "O(n)",
+            code: "int[] diff = new int[n + 1];\nvoid rangeAdd(int l, int r, int val) {\n    diff[l] += val;\n    if (r + 1 < diff.length) diff[r + 1] -= val;\n}\n// after all updates: for i=1..n diff[i]+=diff[i-1]",
+            problems: [["corporate-flight-bookings","Corporate Flight Bookings"]]
+          },
+          {
+            name: "Kadane's Algorithm",
+            trigger: "maximum subarray sum, max sum contiguous",
+            when: "Track current sum; reset to 0 when negative. Track global max.",
+            time: "O(n)", space: "O(1)",
+            code: "int maxSum = nums[0], cur = 0;\nfor (int x : nums) {\n    cur = Math.max(x, cur + x);\n    maxSum = Math.max(maxSum, cur);\n}\nreturn maxSum;",
+            problems: [["maximum-subarray","Maximum Subarray"],["maximum-sum-circular-subarray","Max Circular Subarray"]]
+          },
+          {
+            name: "Cyclic Sort",
+            trigger: "array of 1..n with duplicates/missing, find missing number",
+            when: "Place each num at index num-1 by swapping. O(n) in-place.",
+            time: "O(n)", space: "O(1)",
+            code: "int i = 0;\nwhile (i < nums.length) {\n    int correct = nums[i] - 1;\n    if (nums[i] != nums[correct]) {\n        int tmp = nums[i]; nums[i] = nums[correct]; nums[correct] = tmp;\n    } else i++;\n}",
+            problems: [["missing-number","Missing Number"],["find-all-duplicates-in-an-array","Find All Duplicates"]]
+          }
+        ]
+      },
+      {
+        id: "pointers", name: "Two Pointers & Sliding Window",
+        patterns: [
+          {
+            name: "Two Pointers — Opposite Ends",
+            trigger: "sorted array pair, palindrome, container water, 3Sum",
+            when: "Start lo=0, hi=n-1. Move based on comparison with target.",
+            time: "O(n)", space: "O(1)",
+            code: "int lo = 0, hi = nums.length - 1;\nwhile (lo < hi) {\n    int sum = nums[lo] + nums[hi];\n    if (sum == target) { /* found */ break; }\n    else if (sum < target) lo++;\n    else hi--;\n}",
+            problems: [["two-sum-ii-input-array-is-sorted","Two Sum II"],["3sum","3Sum"],["container-with-most-water","Container Water"]]
+          },
+          {
+            name: "Two Pointers — Same Direction",
+            trigger: "remove duplicates in-place, move zeroes, merge sorted",
+            when: "Slow pointer tracks write position; fast scans ahead.",
+            time: "O(n)", space: "O(1)",
+            code: "int slow = 0;\nfor (int fast = 0; fast < nums.length; fast++) {\n    if (condition(nums[fast])) {\n        nums[slow++] = nums[fast];\n    }\n}",
+            problems: [["remove-duplicates-from-sorted-array","Remove Duplicates"],["move-zeroes","Move Zeroes"]]
+          },
+          {
+            name: "Sliding Window — Fixed Size K",
+            trigger: "subarray of size k, window of length k",
+            when: "Add right element, when window size > k remove left. Track aggregate.",
+            time: "O(n)", space: "O(1) or O(k)",
+            code: "int sum = 0, ans = 0;\nfor (int i = 0; i < nums.length; i++) {\n    sum += nums[i];\n    if (i >= k) sum -= nums[i - k];\n    if (i >= k - 1) ans = Math.max(ans, sum);\n}",
+            problems: [["maximum-average-subarray-i","Max Average Subarray I"],["find-all-anagrams-in-a-string","Find Anagrams"]]
+          },
+          {
+            name: "Sliding Window — Variable Size",
+            trigger: "longest/shortest substring, subarray with constraint",
+            when: "Expand hi; while invalid shrink lo. Update answer at each valid state.",
+            time: "O(n)", space: "O(k) charset/map",
+            code: "int lo = 0, ans = 0;\nMap<Character, Integer> win = new HashMap<>();\nfor (int hi = 0; hi < s.length(); hi++) {\n    win.merge(s.charAt(hi), 1, Integer::sum);\n    while (invalid(win)) {\n        char c = s.charAt(lo++);\n        win.merge(c, -1, Integer::sum);\n        if (win.get(c) == 0) win.remove(c);\n    }\n    ans = Math.max(ans, hi - lo + 1);\n}",
+            problems: [["longest-substring-without-repeating-characters","Longest Substring"],["minimum-window-substring","Min Window Substring"]]
+          },
+          {
+            name: "Prefix Sum + Hash Map",
+            trigger: "count subarrays with sum K, continuous array",
+            when: "prefix[j]-prefix[i]=K → count prefixes (prefix[j]-K). Use map of prefix→count.",
+            time: "O(n)", space: "O(n)",
+            code: "Map<Integer, Integer> count = new HashMap<>();\ncount.put(0, 1);\nint prefix = 0, ans = 0;\nfor (int x : nums) {\n    prefix += x;\n    ans += count.getOrDefault(prefix - k, 0);\n    count.merge(prefix, 1, Integer::sum);\n}",
+            problems: [["subarray-sum-equals-k","Subarray Sum Equals K"],["continuous-subarray-sum","Continuous Subarray Sum"]]
+          }
+        ]
+      },
+      {
+        id: "binarysearch", name: "Binary Search",
+        patterns: [
+          {
+            name: "Binary Search — Classic",
+            trigger: "sorted array find target, search insert position",
+            when: "lo <= hi, mid = lo + (hi-lo)/2. Narrow based on comparison.",
+            time: "O(log n)", space: "O(1)",
+            code: "int lo = 0, hi = nums.length - 1;\nwhile (lo <= hi) {\n    int mid = lo + (hi - lo) / 2;\n    if (nums[mid] == target) return mid;\n    if (nums[mid] < target) lo = mid + 1;\n    else hi = mid - 1;\n}\nreturn -1;",
+            problems: [["binary-search","Binary Search"],["search-insert-position","Search Insert"]]
+          },
+          {
+            name: "Binary Search — Lower / Upper Bound",
+            trigger: "first >= target, last <= target, rotated array",
+            when: "lo < hi variant. lower: if nums[mid]<target lo=mid+1 else hi=mid.",
+            time: "O(log n)", space: "O(1)",
+            code: "// lower bound: first index with nums[i] >= target\nint lo = 0, hi = nums.length;\nwhile (lo < hi) {\n    int mid = lo + (hi - lo) / 2;\n    if (nums[mid] < target) lo = mid + 1;\n    else hi = mid;\n}\nreturn lo;",
+            problems: [["find-first-and-last-position-of-element-in-sorted-array","First Last Position"],["search-in-rotated-sorted-array","Search Rotated"]]
+          },
+          {
+            name: "Binary Search on Answer",
+            trigger: "minimize maximum, maximize minimum, capacity/speed problems",
+            when: "Answer space is monotonic. BS on [lo,hi]; check(mid) feasibility.",
+            time: "O(n log range)", space: "O(1)",
+            code: "int lo = minAnswer, hi = maxAnswer;\nwhile (lo < hi) {\n    int mid = lo + (hi - lo) / 2;\n    if (canDo(mid)) hi = mid;      // minimize\n    else lo = mid + 1;\n}\nreturn lo;",
+            problems: [["koko-eating-bananas","Koko Bananas"],["capacity-to-ship-packages-within-d-days","Ship Packages"]]
+          }
+        ]
+      },
+      {
+        id: "linkedlist", name: "Linked List",
+        patterns: [
+          {
+            name: "Fast & Slow Pointer",
+            trigger: "cycle detection, find middle, palindrome list",
+            when: "slow moves 1, fast moves 2. Cycle: they meet. Middle: slow at mid.",
+            time: "O(n)", space: "O(1)",
+            code: "ListNode slow = head, fast = head;\nwhile (fast != null && fast.next != null) {\n    slow = slow.next;\n    fast = fast.next.next;\n}\n// slow = middle (or cycle entry with phase 2)",
+            problems: [["linked-list-cycle","LL Cycle"],["middle-of-the-linked-list","Middle LL"],["linked-list-cycle-ii","Cycle Entry"]]
+          },
+          {
+            name: "Reverse Linked List",
+            trigger: "reverse list, reverse between m-n, k-group reverse",
+            when: "Iterative: prev=null, flip next pointers one by one.",
+            time: "O(n)", space: "O(1)",
+            code: "ListNode prev = null, cur = head;\nwhile (cur != null) {\n    ListNode next = cur.next;\n    cur.next = prev;\n    prev = cur;\n    cur = next;\n}\nreturn prev;",
+            problems: [["reverse-linked-list","Reverse LL"],["reverse-linked-list-ii","Reverse II"]]
+          },
+          {
+            name: "Merge Linked Lists",
+            trigger: "merge two sorted lists, merge k lists",
+            when: "Dummy head simplifies. Compare heads, attach smaller, advance.",
+            time: "O(n+m)", space: "O(1)",
+            code: "ListNode dummy = new ListNode(0), tail = dummy;\nwhile (l1 != null && l2 != null) {\n    if (l1.val <= l2.val) { tail.next = l1; l1 = l1.next; }\n    else { tail.next = l2; l2 = l2.next; }\n    tail = tail.next;\n}\ntail.next = (l1 != null) ? l1 : l2;\nreturn dummy.next;",
+            problems: [["merge-two-sorted-lists","Merge Two Lists"],["merge-k-sorted-lists","Merge K Lists"]]
+          },
+          {
+            name: "Dummy Head Node",
+            trigger: "delete node, insert before head, reorder list",
+            when: "Avoid special-casing head. Return dummy.next as new head.",
+            time: "O(n)", space: "O(1)",
+            code: "ListNode dummy = new ListNode(0, head);\nListNode prev = dummy, cur = head;\nwhile (cur != null) {\n    if (shouldRemove(cur)) prev.next = cur.next;\n    else prev = cur;\n    cur = cur.next;\n}\nreturn dummy.next;",
+            problems: [["remove-linked-list-elements","Remove Elements"],["remove-nth-node-from-end-of-list","Remove Nth Node"]]
+          }
+        ]
+      },
+      {
+        id: "stackqueue", name: "Stack & Queue",
+        patterns: [
+          {
+            name: "Stack — Matching / Parsing",
+            trigger: "valid parentheses, decode string, calculator",
+            when: "Use ArrayDeque as stack. Push openers; pop and match on closers.",
+            time: "O(n)", space: "O(n)",
+            code: "Deque<Character> stack = new ArrayDeque<>();\nfor (char c : s.toCharArray()) {\n    if (isOpen(c)) stack.push(c);\n    else if (stack.isEmpty() || !matches(stack.pop(), c)) return false;\n}\nreturn stack.isEmpty();",
+            problems: [["valid-parentheses","Valid Parentheses"],["decode-string","Decode String"]]
+          },
+          {
+            name: "Monotonic Stack",
+            trigger: "next greater element, daily temperatures, histogram",
+            when: "Stack keeps decreasing/increasing order. Pop when current violates.",
+            time: "O(n)", space: "O(n)",
+            code: "Deque<Integer> stack = new ArrayDeque<>(); // indices\nint[] ans = new int[n];\nfor (int i = 0; i < n; i++) {\n    while (!stack.isEmpty() && nums[i] > nums[stack.peek()]) {\n        ans[stack.pop()] = i - stack.peek(); // or nums[i]\n    }\n    stack.push(i);\n}",
+            problems: [["daily-temperatures","Daily Temperatures"],["largest-rectangle-in-histogram","Largest Rectangle"]]
+          },
+          {
+            name: "BFS Queue",
+            trigger: "level order, shortest path unweighted, rotting oranges",
+            when: "ArrayDeque for queue. offer poll. Track size for levels.",
+            time: "O(V+E)", space: "O(V)",
+            code: "Deque<int[]> q = new ArrayDeque<>();\nq.offer(new int[]{sr, sc});\nwhile (!q.isEmpty()) {\n    int size = q.size();\n    for (int i = 0; i < size; i++) {\n        int[] cell = q.poll();\n        // process neighbors, mark visited\n    }\n}",
+            problems: [["binary-tree-level-order-traversal","Level Order"],["rotting-oranges","Rotting Oranges"]]
+          },
+          {
+            name: "Monotonic Deque — Sliding Max",
+            trigger: "sliding window maximum, constrained subsequence",
+            when: "Deque stores indices in decreasing value order. Front = max.",
+            time: "O(n)", space: "O(k)",
+            code: "Deque<Integer> dq = new ArrayDeque<>();\nfor (int i = 0; i < nums.length; i++) {\n    while (!dq.isEmpty() && dq.peekFirst() < i - k + 1) dq.pollFirst();\n    while (!dq.isEmpty() && nums[dq.peekLast()] <= nums[i]) dq.pollLast();\n    dq.offerLast(i);\n    if (i >= k - 1) ans[i - k + 1] = nums[dq.peekFirst()];\n}",
+            problems: [["sliding-window-maximum","Sliding Window Max"],["shortest-subarray-with-sum-at-least-k","Shortest Subarray Sum K"]]
+          }
+        ]
+      },
+      {
+        id: "tree", name: "Tree & BST",
+        patterns: [
+          {
+            name: "Tree DFS — Recursive",
+            trigger: "path sum, max depth, invert, diameter",
+            when: "Base null. Recurse left/right. Combine results at current node.",
+            time: "O(n)", space: "O(h)",
+            code: "int dfs(TreeNode node) {\n    if (node == null) return 0;\n    int left = dfs(node.left);\n    int right = dfs(node.right);\n    return Math.max(left, right) + 1; // adapt per problem\n}",
+            problems: [["maximum-depth-of-binary-tree","Max Depth"],["diameter-of-binary-tree","Diameter"],["binary-tree-maximum-path-sum","Max Path Sum"]]
+          },
+          {
+            name: "Tree BFS — Level Order",
+            trigger: "level by level, right side view, zigzag",
+            when: "Queue of nodes. Process level size batch. Add children.",
+            time: "O(n)", space: "O(w)",
+            code: "Deque<TreeNode> q = new ArrayDeque<>();\nq.offer(root);\nwhile (!q.isEmpty()) {\n    int size = q.size();\n    List<Integer> level = new ArrayList<>();\n    for (int i = 0; i < size; i++) {\n        TreeNode node = q.poll();\n        level.add(node.val);\n        if (node.left != null) q.offer(node.left);\n        if (node.right != null) q.offer(node.right);\n    }\n    result.add(level);\n}",
+            problems: [["binary-tree-level-order-traversal","Level Order"],["binary-tree-right-side-view","Right Side View"]]
+          },
+          {
+            name: "BST — Inorder Property",
+            trigger: "validate BST, kth smallest, LCA in BST",
+            when: "Inorder gives sorted order. Pass min/max bounds down recursion.",
+            time: "O(n)", space: "O(h)",
+            code: "boolean valid(TreeNode node, long min, long max) {\n    if (node == null) return true;\n    if (node.val <= min || node.val >= max) return false;\n    return valid(node.left, min, node.val)\n        && valid(node.right, node.val, max);\n}",
+            problems: [["validate-binary-search-tree","Validate BST"],["kth-smallest-element-in-a-bst","Kth Smallest BST"]]
+          },
+          {
+            name: "Tree — Serialize / Deserialize",
+            trigger: "encode tree to string, decode back",
+            when: "Preorder with null markers, or BFS with nulls. Queue/stack for rebuild.",
+            time: "O(n)", space: "O(n)",
+            code: "StringBuilder sb = new StringBuilder();\nvoid pre(TreeNode n) {\n    if (n == null) { sb.append(\"#,\"); return; }\n    sb.append(n.val).append(\",\");\n    pre(n.left); pre(n.right);\n}",
+            problems: [["serialize-and-deserialize-binary-tree","Serialize Tree"]]
+          }
+        ]
+      },
+      {
+        id: "graph", name: "Graph",
+        patterns: [
+          {
+            name: "Graph DFS",
+            trigger: "number of islands, clone graph, path exists",
+            when: "Adjacency list Map<Integer,List<Integer>>. visited set/array. Recurse or stack.",
+            time: "O(V+E)", space: "O(V)",
+            code: "Map<Integer, List<Integer>> graph = new HashMap<>();\nvoid dfs(int node, Set<Integer> vis) {\n    if (!vis.add(node)) return;\n    for (int nei : graph.getOrDefault(node, List.of())) dfs(nei, vis);\n}",
+            problems: [["number-of-islands","Number of Islands"],["clone-graph","Clone Graph"]]
+          },
+          {
+            name: "Graph BFS",
+            trigger: "shortest path unweighted, word ladder",
+            when: "Queue with (node, distance). Mark visited on enqueue.",
+            time: "O(V+E)", space: "O(V)",
+            code: "Deque<int[]> q = new ArrayDeque<>();\nq.offer(new int[]{start, 0});\nSet<Integer> vis = new HashSet<>();\nvis.add(start);\nwhile (!q.isEmpty()) {\n    int[] cur = q.poll();\n    if (cur[0] == target) return cur[1];\n    for (int nei : adj.get(cur[0])) {\n        if (vis.add(nei)) q.offer(new int[]{nei, cur[1] + 1});\n    }\n}",
+            problems: [["word-ladder","Word Ladder"],["open-the-lock","Open the Lock"]]
+          },
+          {
+            name: "Multi-Source BFS",
+            trigger: "rotting oranges, walls and gates, 01 matrix",
+            when: "Enqueue ALL sources at once with distance 0. Standard BFS.",
+            time: "O(mn)", space: "O(mn)",
+            code: "Deque<int[]> q = new ArrayDeque<>();\nfor each source cell: q.offer(new int[]{r,c,0});\nwhile (!q.isEmpty()) { /* BFS, update grid distances */ }",
+            problems: [["rotting-oranges","Rotting Oranges"],["01-matrix","01 Matrix"]]
+          },
+          {
+            name: "Topological Sort — Kahn's (BFS)",
+            trigger: "course schedule, build order, alien dictionary",
+            when: "In-degree count. Queue nodes with in-degree 0. Process and reduce neighbors.",
+            time: "O(V+E)", space: "O(V)",
+            code: "int[] indeg = new int[n];\nfor (edge : edges) indeg[edge[1]]++;\nDeque<Integer> q = new ArrayDeque<>();\nfor (int i = 0; i < n; i++) if (indeg[i] == 0) q.offer(i);\nList<Integer> order = new ArrayList<>();\nwhile (!q.isEmpty()) {\n    int u = q.poll(); order.add(u);\n    for (int v : adj.get(u)) if (--indeg[v] == 0) q.offer(v);\n}\nreturn order.size() == n;",
+            problems: [["course-schedule","Course Schedule"],["course-schedule-ii","Course Schedule II"]]
+          },
+          {
+            name: "Union Find (Disjoint Set)",
+            trigger: "connected components, redundant connection, accounts merge",
+            when: "find with path compression + union by rank. Detect cycle if same root.",
+            time: "O(α(n)) per op", space: "O(n)",
+            code: "class UF {\n    int[] parent, rank;\n    UF(int n) { parent = new int[n]; rank = new int[n]; for (int i=0;i<n;i++) parent[i]=i; }\n    int find(int x) { return parent[x]==x ? x : (parent[x]=find(parent[x])); }\n    boolean union(int a, int b) {\n        a=find(a); b=find(b); if (a==b) return false;\n        if (rank[a]<rank[b]) parent[a]=b; else { parent[b]=a; if (rank[a]==rank[b]) rank[a]++; }\n        return true;\n    }\n}",
+            problems: [["number-of-connected-components-in-an-undirected-graph","Connected Components"],["redundant-connection","Redundant Connection"]]
+          },
+          {
+            name: "Dijkstra's Algorithm",
+            trigger: "shortest path weighted graph, network delay",
+            when: "PriorityQueue by distance. Relax neighbors if shorter path found.",
+            time: "O(E log V)", space: "O(V)",
+            code: "int[] dist = new int[n]; Arrays.fill(dist, Integer.MAX_VALUE);\ndist[src] = 0;\nPriorityQueue<int[]> pq = new PriorityQueue<>(Comparator.comparingInt(a -> a[1]));\npq.offer(new int[]{src, 0});\nwhile (!pq.isEmpty()) {\n    int[] cur = pq.poll();\n    if (cur[1] > dist[cur[0]]) continue;\n    for (int[] e : adj.get(cur[0])) {\n        int nd = cur[1] + e[1];\n        if (nd < dist[e[0]]) { dist[e[0]] = nd; pq.offer(new int[]{e[0], nd}); }\n    }\n}",
+            problems: [["network-delay-time","Network Delay"],["cheapest-flights-within-k-stops","Cheapest Flights"]]
+          }
+        ]
+      },
+      {
+        id: "backtrack", name: "Backtracking",
+        patterns: [
+          {
+            name: "Backtracking — Subsets",
+            trigger: "all subsets, combinations, subsets with duplicates",
+            when: "Start index avoids reuse. Include/exclude each element. Copy path to result.",
+            time: "O(2^n)", space: "O(n)",
+            code: "void backtrack(int start, List<Integer> path) {\n    result.add(new ArrayList<>(path));\n    for (int i = start; i < nums.length; i++) {\n        path.add(nums[i]);\n        backtrack(i + 1, path);\n        path.remove(path.size() - 1);\n    }\n}",
+            problems: [["subsets","Subsets"],["combination-sum","Combination Sum"]]
+          },
+          {
+            name: "Backtracking — Permutations",
+            trigger: "all permutations, letter combinations, palindrome partition",
+            when: "Use used[] or swap. Try each unused choice at current position.",
+            time: "O(n!)", space: "O(n)",
+            code: "void permute(List<Integer> path, boolean[] used) {\n    if (path.size() == nums.length) { result.add(new ArrayList<>(path)); return; }\n    for (int i = 0; i < nums.length; i++) {\n        if (used[i]) continue;\n        used[i] = true; path.add(nums[i]);\n        permute(path, used);\n        path.remove(path.size()-1); used[i] = false;\n    }\n}",
+            problems: [["permutations","Permutations"],["letter-combinations-of-a-phone-number","Letter Combinations"]]
+          },
+          {
+            name: "Backtracking — Grid / Path",
+            trigger: "word search, n-queens, sudoku",
+            when: "Mark cell visited, recurse 4 directions, unmark on return.",
+            time: "O(m·n·4^L)", space: "O(L)",
+            code: "boolean dfs(char[][] board, int r, int c, int idx) {\n    if (idx == word.length()) return true;\n    if (r<0||c<0||r>=R||c>=C||board[r][c]!=word.charAt(idx)) return false;\n    char tmp = board[r][c]; board[r][c] = '#';\n    boolean found = dfs(board,r+1,c,idx+1)||dfs(board,r-1,c,idx+1)\n        ||dfs(board,r,c+1,idx+1)||dfs(board,r,c-1,idx+1);\n    board[r][c] = tmp;\n    return found;\n}",
+            problems: [["word-search","Word Search"],["n-queens","N-Queens"]]
+          }
+        ]
+      },
+      {
+        id: "dp", name: "Dynamic Programming",
+        patterns: [
+          {
+            name: "1D DP",
+            trigger: "climbing stairs, house robber, decode ways, coin change",
+            when: "dp[i] = best answer using first i elements. Transition from smaller states.",
+            time: "O(n)", space: "O(n) or O(1)",
+            code: "int[] dp = new int[n + 1];\ndp[0] = base;\nfor (int i = 1; i <= n; i++) {\n    dp[i] = Math.max(dp[i-1], dp[i-2] + nums[i]); // adapt\n}\nreturn dp[n];",
+            problems: [["climbing-stairs","Climbing Stairs"],["house-robber","House Robber"],["coin-change","Coin Change"]]
+          },
+          {
+            name: "2D DP — Grid",
+            trigger: "unique paths, min path sum, dungeon game",
+            when: "dp[r][c] from top-left. Transition from up and left.",
+            time: "O(mn)", space: "O(mn) or O(n)",
+            code: "int[][] dp = new int[m][n];\ndp[0][0] = grid[0][0];\nfor (int r = 0; r < m; r++)\n  for (int c = 0; c < n; c++)\n    dp[r][c] = grid[r][c] + Math.min(get(r-1,c), get(r,c-1));\nreturn dp[m-1][n-1];",
+            problems: [["unique-paths","Unique Paths"],["minimum-path-sum","Min Path Sum"]]
+          },
+          {
+            name: "DP — Two Sequences (LCS)",
+            trigger: "LCS, edit distance, interleaving string",
+            when: "dp[i][j] = answer for s1[0..i) and s2[0..j). Match or skip char.",
+            time: "O(mn)", space: "O(mn)",
+            code: "int[][] dp = new int[m+1][n+1];\nfor (int i = 1; i <= m; i++)\n  for (int j = 1; j <= n; j++)\n    if (s1.charAt(i-1) == s2.charAt(j-1)) dp[i][j] = dp[i-1][j-1] + 1;\n    else dp[i][j] = Math.max(dp[i-1][j], dp[i][j-1]);",
+            problems: [["longest-common-subsequence","LCS"],["edit-distance","Edit Distance"]]
+          },
+          {
+            name: "0/1 Knapsack",
+            trigger: "partition equal subset, target sum with +/- signs",
+            when: "dp[cap] = can we make sum cap? Iterate items, update backwards.",
+            time: "O(n·W)", space: "O(W)",
+            code: "boolean[] dp = new boolean[sum + 1];\ndp[0] = true;\nfor (int num : nums)\n  for (int j = sum; j >= num; j--)\n    dp[j] |= dp[j - num];\nreturn dp[sum];",
+            problems: [["partition-equal-subset-sum","Partition Equal Subset"],["target-sum","Target Sum"]]
+          },
+          {
+            name: "Unbounded Knapsack",
+            trigger: "coin change (min coins), coin change II (ways)",
+            when: "Each item reusable. Forward loop over capacity.",
+            time: "O(n·W)", space: "O(W)",
+            code: "int[] dp = new int[amount + 1];\nArrays.fill(dp, amount + 1); dp[0] = 0;\nfor (int coin : coins)\n  for (int a = coin; a <= amount; a++)\n    dp[a] = Math.min(dp[a], dp[a - coin] + 1);",
+            problems: [["coin-change","Coin Change"],["coin-change-ii","Coin Change II"]]
+          },
+          {
+            name: "LIS — Longest Increasing Subsequence",
+            trigger: "longest increasing subsequence, envelope nesting",
+            when: "DP O(n²) or patience sorting with binary search O(n log n).",
+            time: "O(n log n)", space: "O(n)",
+            code: "List<Integer> tails = new ArrayList<>();\nfor (int x : nums) {\n    int pos = Collections.binarySearch(tails, x);\n    if (pos < 0) pos = -(pos + 1);\n    if (pos == tails.size()) tails.add(x);\n    else tails.set(pos, x);\n}\nreturn tails.size();",
+            problems: [["longest-increasing-subsequence","LIS"],["russian-doll-envelopes","Russian Doll"]]
+          }
+        ]
+      },
+      {
+        id: "heap", name: "Heap, Greedy & Intervals",
+        patterns: [
+          {
+            name: "Top K — Min Heap",
+            trigger: "kth largest, k closest points, top k frequent",
+            when: "Maintain heap of size k. Min-heap for k largest; max-heap for k smallest.",
+            time: "O(n log k)", space: "O(k)",
+            code: "PriorityQueue<Integer> minHeap = new PriorityQueue<>();\nfor (int x : nums) {\n    minHeap.offer(x);\n    if (minHeap.size() > k) minHeap.poll();\n}\nreturn minHeap.peek();",
+            problems: [["kth-largest-element-in-an-array","Kth Largest"],["top-k-frequent-elements","Top K Frequent"]]
+          },
+          {
+            name: "Two Heaps — Running Median",
+            trigger: "find median from data stream, sliding window median",
+            when: "Max-heap for lower half, min-heap for upper half. Balance sizes.",
+            time: "O(log n) insert", space: "O(n)",
+            code: "PriorityQueue<Integer> lo = new PriorityQueue<>(Collections.reverseOrder());\nPriorityQueue<Integer> hi = new PriorityQueue<>();\nvoid add(int x) {\n    lo.offer(x); hi.offer(lo.poll());\n    if (lo.size() < hi.size()) lo.offer(hi.poll());\n}\ndouble median() { return lo.size() > hi.size() ? lo.peek() : (lo.peek() + hi.peek()) / 2.0; }",
+            problems: [["find-median-from-data-stream","Median Stream"]]
+          },
+          {
+            name: "Merge K Sorted — Heap",
+            trigger: "merge k sorted lists, kth smallest in sorted matrix",
+            when: "Heap of (value, listIndex, elemIndex). Poll min, push next from same list.",
+            time: "O(N log k)", space: "O(k)",
+            code: "PriorityQueue<int[]> pq = new PriorityQueue<>(Comparator.comparingInt(a -> a[0]));\nfor (int i = 0; i < lists.length; i++)\n  if (lists[i] != null) pq.offer(new int[]{lists[i].val, i});\n// poll, attach to result, offer lists[i].next",
+            problems: [["merge-k-sorted-lists","Merge K Lists"],["kth-smallest-element-in-a-sorted-matrix","Kth in Matrix"]]
+          },
+          {
+            name: "Greedy — Intervals",
+            trigger: "merge intervals, meeting rooms, non-overlapping intervals",
+            when: "Sort by start (or end). Greedily extend or count conflicts.",
+            time: "O(n log n)", space: "O(n)",
+            code: "Arrays.sort(intervals, Comparator.comparingInt(a -> a[0]));\nList<int[]> merged = new ArrayList<>();\nfor (int[] iv : intervals) {\n    if (merged.isEmpty() || merged.get(merged.size()-1)[1] < iv[0])\n        merged.add(iv);\n    else merged.get(merged.size()-1)[1] = Math.max(merged.get(merged.size()-1)[1], iv[1]);\n}",
+            problems: [["merge-intervals","Merge Intervals"],["meeting-rooms-ii","Meeting Rooms II"]]
+          },
+          {
+            name: "Greedy — Jump / Reachability",
+            trigger: "jump game, gas station, assign cookies",
+            when: "Track farthest reachable. If i > farthest, impossible.",
+            time: "O(n)", space: "O(1)",
+            code: "int farthest = 0;\nfor (int i = 0; i < nums.length; i++) {\n    if (i > farthest) return false;\n    farthest = Math.max(farthest, i + nums[i]);\n}\nreturn true;",
+            problems: [["jump-game","Jump Game"],["jump-game-ii","Jump Game II"]]
+          }
+        ]
+      },
+      {
+        id: "design", name: "Design, Trie & Bit Manipulation",
+        patterns: [
+          {
+            name: "Trie (Prefix Tree)",
+            trigger: "prefix search, autocomplete, word search II",
+            when: "Each node has Map<Character, TrieNode> children + end flag.",
+            time: "O(L) per word", space: "O(total chars)",
+            code: "class TrieNode { Map<Character, TrieNode> next = new HashMap<>(); boolean end; }\nclass Trie {\n    TrieNode root = new TrieNode();\n    void insert(String w) {\n        TrieNode cur = root;\n        for (char c : w.toCharArray()) cur = cur.next.computeIfAbsent(c, k -> new TrieNode());\n        cur.end = true;\n    }\n    boolean search(String w) { /* walk + check end */ }\n}",
+            problems: [["implement-trie-prefix-tree","Implement Trie"],["word-search-ii","Word Search II"]]
+          },
+          {
+            name: "LRU Cache — LinkedHashMap",
+            trigger: "design LRU cache, LFU cache",
+            when: "LinkedHashMap(accessOrder=true) + removeEldestEntry override.",
+            time: "O(1) get/put", space: "O(capacity)",
+            code: "class LRUCache extends LinkedHashMap<Integer, Integer> {\n    int cap;\n    LRUCache(int c) { super(c, 0.75f, true); cap = c; }\n    protected boolean removeEldestEntry(Map.Entry<Integer,Integer> e) {\n        return size() > cap;\n    }\n    public int get(int key) { return super.getOrDefault(key, -1); }\n}",
+            problems: [["lru-cache","LRU Cache"]]
+          },
+          {
+            name: "LRU Cache — Manual (Interview)",
+            trigger: "implement without LinkedHashMap",
+            when: "HashMap key→Node + doubly linked list. Move to head on get; evict tail.",
+            time: "O(1)", space: "O(capacity)",
+            code: "class Node { int k, v; Node prev, next; }\nMap<Integer, Node> map = new HashMap<>();\nNode head, tail; // dummy sentinels\nvoid moveToHead(Node n) { /* unlink + insert after head */ }\nvoid evict() { /* remove tail.prev, remove from map */ }",
+            problems: [["lru-cache","LRU Cache"],["lfu-cache","LFU Cache"]]
+          },
+          {
+            name: "Bit Manipulation — XOR",
+            trigger: "single number, missing number, find duplicate",
+            when: "a^a=0, a^0=a. XOR all elements cancels pairs.",
+            time: "O(n)", space: "O(1)",
+            code: "int xor = 0;\nfor (int x : nums) xor ^= x;\nreturn xor; // single unique element",
+            problems: [["single-number","Single Number"],["missing-number","Missing Number"]]
+          },
+          {
+            name: "Bitmask — Subsets",
+            trigger: "generate all subsets, partition to k equal sum subsets",
+            when: "For n items, iterate mask 0 to (1<<n)-1. Include nums[i] if bit i set.",
+            time: "O(2^n · n)", space: "O(n)",
+            code: "for (int mask = 0; mask < (1 << n); mask++) {\n    List<Integer> subset = new ArrayList<>();\n    for (int i = 0; i < n; i++)\n        if ((mask & (1 << i)) != 0) subset.add(nums[i]);\n    result.add(subset);\n}",
+            problems: [["subsets","Subsets"],["maximum-product-of-word-lengths","Max Product Word Lengths"]]
+          }
+        ]
+      },
+      {
+        id: "matrix", name: "Matrix & Misc",
+        patterns: [
+          {
+            name: "Matrix DFS / Flood Fill",
+            trigger: "number of islands, max area of island, surround regions",
+            when: "Iterate grid; on land call dfs to mark visited (sink to '0' or visited[][]).",
+            time: "O(mn)", space: "O(mn)",
+            code: "void dfs(char[][] g, int r, int c) {\n    if (r<0||c<0||r>=R||c>=C||g[r][c]=='0') return;\n    g[r][c] = '0';\n    dfs(g,r+1,c); dfs(g,r-1,c); dfs(g,r,c+1); dfs(g,r,c-1);\n}",
+            problems: [["number-of-islands","Number of Islands"],["max-area-of-island","Max Area Island"]]
+          },
+          {
+            name: "Matrix BFS",
+            trigger: "shortest path in grid, rotten oranges, word ladder II grid",
+            when: "Same as BFS but 4/8 directions. Check bounds and obstacles.",
+            time: "O(mn)", space: "O(mn)",
+            code: "int[][] dirs = {{1,0},{-1,0},{0,1},{0,-1}};\nDeque<int[]> q = new ArrayDeque<>();\nq.offer(new int[]{sr, sc, 0});\nboolean[][] vis = new boolean[R][C];\nvis[sr][sc] = true;",
+            problems: [["01-matrix","01 Matrix"],["shortest-path-in-binary-matrix","Shortest Path Binary Matrix"]]
+          },
+          {
+            name: "QuickSelect — Kth Element",
+            trigger: "kth largest in O(n) average, top k unsorted",
+            when: "Partition like quicksort. Recurse on side containing k.",
+            time: "O(n) avg", space: "O(1)",
+            code: "int quickSelect(int[] nums, int lo, int hi, int k) {\n    int p = partition(nums, lo, hi);\n    if (p == k) return nums[p];\n    if (p < k) return quickSelect(nums, p+1, hi, k);\n    return quickSelect(nums, lo, p-1, k);\n}",
+            problems: [["kth-largest-element-in-an-array","Kth Largest"],["find-kth-largest-xor-coordinate-value","Kth Largest XOR"]]
+          },
+          {
+            name: "Java Streams — Post-Process (Production)",
+            trigger: "group, filter, transform after algorithm solved",
+            when: "Use AFTER core logic in interviews. Great for cleanup/refactor.",
+            time: "varies", space: "varies",
+            code: "Map<Integer, Long> freq = Arrays.stream(nums)\n    .boxed().collect(Collectors.groupingBy(x -> x, Collectors.counting()));\nList<String> top = words.stream()\n    .filter(w -> w.length() > 3)\n    .sorted(Comparator.comparingInt(String::length))\n    .collect(Collectors.toList());",
+            problems: [["sort-characters-by-frequency","Sort Chars Frequency"]]
+          }
+        ]
+      }
+    ];
+
+    let patternFilter = "all";
+    let patternSearch = "";
+
+    function renderPatternsSection() {
+      const cats = patternCategories.map(c =>
+        `<button class="cat-chip" data-cat="${c.id}" onclick="filterPatterns('${c.id}')">${c.name}</button>`
+      ).join("");
+
+      let html = `<section id="patterns">
+        <div class="week-header">
+          <h2>All DSA Patterns — 100% Java</h2>
+          <span class="phase-tag">55 patterns · java.util only · copy-ready</span>
+        </div>
+        <div class="pattern-toolbar">
+          <input class="pattern-search" id="patternSearch" placeholder="Search patterns (e.g. sliding window, trie, knapsack)..." oninput="searchPatterns(this.value)" />
+          <button class="cat-chip active" data-cat="all" onclick="filterPatterns('all')">All</button>
+          ${cats}
+        </div>`;
+
+      let num = 0;
+      patternCategories.forEach(cat => {
+        html += `<div class="pattern-category" data-category="${cat.id}"><h3>${cat.name}</h3>`;
+        cat.patterns.forEach(p => {
+          num++;
+          const pid = `pattern-${num}`;
+          const probHtml = p.problems.map(([slug, name]) =>
+            `<a class="problem" href="${lc(slug)}" target="_blank" rel="noopener">${name}</a>`
+          ).join("");
+          const codeEsc = p.code.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");
+          html += `<div class="pattern-card" id="${pid}" data-category="${cat.id}" data-search="${(p.name + p.trigger + p.when + cat.name).toLowerCase()}">
+            <div class="pattern-header" onclick="togglePattern('${pid}')">
+              <span class="pattern-num">#${num}</span>
+              <div class="pattern-meta">
+                <div class="pattern-name">${p.name}</div>
+                <div class="pattern-trigger">"${p.trigger}"</div>
+              </div>
+              <span class="complexity-badge">${p.time} · ${p.space}</span>
+              <span class="chevron">▼</span>
+            </div>
+            <div class="pattern-body">
+              <div class="pattern-when"><strong>When to use</strong><br>${p.when}</div>
+              <div class="code-label">Java Template</div>
+              <pre class="templates">${codeEsc}</pre>
+              <div class="block" style="margin-top:0.75rem"><div class="block-label solve">Example Problems</div><div class="problems">${probHtml}</div></div>
+            </div>
+          </div>`;
+        });
+        html += `</div>`;
+      });
+      html += `</section>`;
+      return html;
+    }
+
+    const sdPatterns = [
+      { cat: "Fundamentals", name: "Horizontal vs Vertical Scaling", trigger: "more traffic, scale the system", when: "Vertical = bigger machine. Horizontal = more machines (preferred at scale).", points: "Vertical hits hardware limits; horizontal needs load balancer + stateless services.", cases: "URL Shortener, any high-traffic system" },
+      { cat: "Fundamentals", name: "Load Balancer", trigger: "distribute traffic across servers", when: "Place LB before app servers. Algorithms: round robin, least connections, consistent hash.", points: "L4 (TCP) vs L7 (HTTP). Health checks. Sticky sessions when needed.", cases: "Web apps, API gateways" },
+      { cat: "Fundamentals", name: "CAP Theorem", trigger: "distributed system tradeoffs", when: "Pick 2 of: Consistency, Availability, Partition tolerance. CP = banking. AP = social feeds.", points: "During network partition: strong consistency OR availability, not both.", cases: "Database selection, chat systems" },
+      { cat: "Fundamentals", name: "SQL vs NoSQL", trigger: "choose database type", when: "SQL: ACID, joins, structured schema (Postgres). NoSQL: scale-out, flexible schema (DynamoDB, MongoDB).", points: "Use SQL for transactions; NoSQL for high write throughput, document/kv models.", cases: "Twitter (Cassandra), Uber (MySQL + Schemaless)" },
+      { cat: "Caching", name: "Cache-Aside (Lazy Loading)", trigger: "reduce DB reads", when: "App checks cache → miss → read DB → write cache. Invalidate on update.", points: "Simple, popular pattern. Watch stale data + cache stampede.", cases: "URL Shortener, Product catalog" },
+      { cat: "Caching", name: "Write-Through / Write-Back", trigger: "keep cache and DB in sync", when: "Write-through: write cache + DB together. Write-back: write cache, async flush to DB.", points: "Write-through = consistent but slower writes. Write-back = fast but risk data loss.", cases: "Write-heavy systems" },
+      { cat: "Caching", name: "Redis + CDN", trigger: "hot data, static assets globally", when: "Redis in-memory for sessions, counters, leaderboards. CDN for images/video at edge.", points: "Set TTL on cache keys. CDN cache-control headers.", cases: "Netflix, Instagram, Rate Limiter" },
+      { cat: "Database", name: "Database Indexing", trigger: "slow queries at scale", when: "B-tree indexes on frequently queried columns. Covering indexes avoid table lookups.", points: "Trade write speed for read speed. Explain EXPLAIN plans in interviews.", cases: "Any SQL-backed design" },
+      { cat: "Database", name: "Replication & Sharding", trigger: "read scaling, data too large for one node", when: "Replication: primary-replica for reads. Sharding: partition by user_id/hash/range.", points: "Shard key choice is critical. Cross-shard queries are expensive.", cases: "Instagram, Uber, WhatsApp" },
+      { cat: "Database", name: "Consistent Hashing", trigger: "distributed cache, minimal remapping on node add/remove", when: "Hash ring with virtual nodes. Used in CDNs, distributed caches, load balancers.", points: "Only K/n keys move when node added. Draw ring in interview.", cases: "DynamoDB, Cassandra, URL Shortener" },
+      { cat: "Messaging", name: "Message Queue (Kafka)", trigger: "async processing, decouple services", when: "Producer → topic → consumer groups. At-least-once vs exactly-once delivery.", points: "Use for: event sourcing, log aggregation, feed fan-out, order processing.", cases: "Uber trip events, Netflix analytics, Twitter fan-out" },
+      { cat: "Messaging", name: "Pub/Sub & Event-Driven", trigger: "real-time notifications, microservice communication", when: "Publishers don't know subscribers. Multiple consumers per event type.", points: "Combine with idempotent consumers. Dead letter queues for failures.", cases: "Notification system, Order pipeline" },
+      { cat: "API", name: "REST API Design", trigger: "define service interfaces", when: "Resources as nouns (/users/{id}). HTTP verbs. Pagination, versioning, rate limit headers.", points: "Idempotent: GET, PUT, DELETE. POST creates. Return proper status codes.", cases: "All system design cases" },
+      { cat: "API", name: "Rate Limiting", trigger: "prevent abuse, fair usage", when: "Token bucket or sliding window counter in Redis. Return 429 + Retry-After.", points: "Per-user vs per-IP. Distributed rate limit needs shared store.", cases: "Rate Limiter design, public APIs" },
+      { cat: "Architecture", name: "Microservices vs Monolith", trigger: "how to structure backend", when: "Monolith first for startups. Microservices when teams scale + independent deploy needed.", points: "Microservices: service discovery, API gateway, distributed tracing overhead.", cases: "Netflix microservices, early startup monolith" },
+      { cat: "Architecture", name: "API Gateway", trigger: "single entry point for clients", when: "Auth, rate limiting, routing, SSL termination at gateway (Kong, AWS API GW).", points: "BFF pattern for mobile vs web. Don't put business logic in gateway.", cases: "Uber, Netflix Zuul" },
+      { cat: "Storage", name: "Blob Storage (S3)", trigger: "store images, videos, files", when: "Object storage for media. Metadata in DB, file in S3. Pre-signed URLs for upload.", points: "CDN in front of S3. Lifecycle policies for archival.", cases: "Instagram, YouTube, WhatsApp media" },
+      { cat: "Search", name: "Full-Text Search (Elasticsearch)", trigger: "search autocomplete, log analytics", when: "Inverted index for tokens. Trie + ES for typeahead. Separate search index from primary DB.", points: "Async index updates via Kafka. Rank by relevance/freshness.", cases: "Search Autocomplete, Twitter search" },
+      { cat: "Real-time", name: "WebSockets & Long Polling", trigger: "chat, live updates, notifications", when: "WebSocket for bidirectional real-time. Fallback: SSE or long polling.", points: "Connection management at scale needs pub/sub backplane (Redis Pub/Sub).", cases: "WhatsApp, Live sports scores" },
+      { cat: "Reliability", name: "Idempotency & Distributed Lock", trigger: "duplicate requests, concurrent writes", when: "Idempotency keys on POST. Distributed lock (Redis Redlock) for critical sections.", points: "Retries safe with idempotent APIs. Leader election for singleton workers.", cases: "Payment systems, ticket booking" }
+    ];
+
+    function renderSystemDesignPatternsSection() {
+      const cats = [...new Set(sdPatterns.map(p => p.cat))];
+      let html = `<section id="sd-patterns">
+        <div class="week-header">
+          <h2>System Design — Java Backend</h2>
+          <span class="phase-tag">Spring Boot · microservices · 20 patterns</span>
+        </div>
+        <div class="pattern-toolbar">
+          <input class="pattern-search" id="sdSearch" placeholder="Search SD patterns (cache, kafka, sharding)..." oninput="searchSdPatterns(this.value)" />
+        </div>`;
+      let num = 0;
+      cats.forEach(cat => {
+        html += `<div class="pattern-category sd-cat"><h3>${cat}</h3>`;
+        sdPatterns.filter(p => p.cat === cat).forEach(p => {
+          num++;
+          const pid = `sd-${num}`;
+          const search = (p.name + p.trigger + p.when + p.cat).toLowerCase();
+          html += `<div class="pattern-card sd-card" id="${pid}" data-search="${search}">
+            <div class="pattern-header" onclick="togglePattern('${pid}')">
+              <span class="pattern-num" style="color:#34d399;background:rgba(52,211,153,0.12)">SD${num}</span>
+              <div class="pattern-meta">
+                <div class="pattern-name">${p.name}</div>
+                <div class="pattern-trigger">"${p.trigger}"</div>
+              </div>
+              <span class="chevron">▼</span>
+            </div>
+            <div class="pattern-body">
+              <div class="pattern-when"><strong>When to use</strong><br>${p.when}</div>
+              <div class="pattern-when"><strong>Key points</strong><br>${p.points}</div>
+              <div class="block"><div class="block-label sd">Example Cases</div><p>${p.cases}</p></div>
+            </div>
+          </div>`;
+        });
+        html += `</div>`;
+      });
+      html += `<h3 style="margin:1.5rem 0 0.75rem;font-size:1rem;">HLD Interview Framework (45 min)</h3>
+        <pre class="templates">1. REQUIREMENTS (5m)   — Functional + Non-functional (scale, latency, consistency)
+2. ESTIMATIONS (5m)    — DAU, QPS, storage (back-of-envelope)
+3. API DESIGN (5m)     — REST endpoints, request/response
+4. DATA MODEL (5m)     — Tables, shard key, indexes
+5. HIGH-LEVEL DIAGRAM  — LB → App → Cache → DB → Queue → CDN
+6. DEEP DIVE (15m)     — Bottleneck, caching, sharding, fan-out
+7. TRADE-OFFS (5m)     — What you'd do differently at 10x scale</pre>
+      </section>`;
+      return html;
+    }
+
+    function searchSdPatterns(q) {
+      const s = q.toLowerCase().trim();
+      document.querySelectorAll(".sd-card").forEach(card => {
+        card.classList.toggle("hidden", s && !card.dataset.search.includes(s));
+      });
+      document.querySelectorAll(".sd-cat").forEach(cat => {
+        const visible = cat.querySelectorAll(".sd-card:not(.hidden)").length;
+        cat.style.display = visible ? "" : "none";
+      });
+    }
+
+    function searchSdPatterns(q) {
+      const s = q.toLowerCase().trim();
+      document.querySelectorAll(".sd-card").forEach(card => {
+        card.classList.toggle("hidden", s && !card.dataset.search.includes(s));
+      });
+      document.querySelectorAll(".sd-cat").forEach(cat => {
+        const visible = cat.querySelectorAll(".sd-card:not(.hidden)").length;
+        cat.style.display = visible ? "" : "none";
+      });
+    }
+
+    const companies = [
+      {
+        id: "companies-meta", abbr: "Meta", name: "Meta (Facebook)", color: "#0668E1",
+        role: "E3 / E4 Software Engineer",
+        process: "Recruiter → Phone screen (1 code) → Onsite (2 coding + 1 system design + 1 behavioral)",
+        oa: "CodeSignal / HackerRank — 2 Medium–Hard. Heavy on graphs, trees, BFS/DFS, DP.",
+        focus: { dsa: 5, java: 4, sd: 5, behavioral: 4 },
+        javaNotes: "Interview in Java only. Collections, clean OOP, immutability where possible. Backend teams use Java heavily — know ArrayList, HashMap, PriorityQueue cold.",
+        sdNotes: "SD round mandatory for E4+. News Feed, Instagram, Messenger, ad ranking. Fan-out on write/read deep dives.",
+        behavioral: "Meta values: Move Fast, Focus on Impact, Be Bold, Build Social Value. STAR stories with metrics.",
+        lps: ["Most impactful project", "Conflict with teammate", "Tight deadline / Move Fast", "Failed project and learnings", "Why Meta?", "Design decision you disagreed with"],
+        patterns: "Graphs BFS/DFS, trees, DP, sliding window, heaps, topological sort, backtracking",
+        planDays: "Weeks 1–5 full DSA · Week 6 Day 38 (News Feed) · Week 7 Day 43 Meta sprint",
+        mustDo: [["clone-graph","Clone Graph"],["course-schedule","Course Schedule"],["number-of-islands","Number of Islands"],["word-search","Word Search"],["subsets","Subsets"],["binary-tree-level-order-traversal","Level Order"],["merge-k-sorted-lists","Merge K Lists"],["longest-substring-without-repeating-characters","Longest Substring"],["valid-parentheses","Valid Parentheses"],["random-pick-with-weight","Random Pick Weight"],["accounts-merge","Accounts Merge"],["design-twitter","Design Twitter"]],
+        tips: ["Product sense helps — know how News Feed / Stories work at high level", "Coding in Java only — Meta expects near-optimal complexity", "SD: fan-out strategy + Java microservice layout", "Use NeetCode Meta 75 — solve all in Java", "Bootcamp culture — show you learn fast"]
+      },
+      {
+        id: "companies-amazon", abbr: "AMZ", name: "Amazon", color: "#ff9900",
+        role: "SDE 1 / SDE 2",
+        process: "OA (2 codes, ~70 min) → Phone (1 LP + 1 code) → Loop (4–5: 2 coding + 2–3 Leadership Principles)",
+        oa: "2 Medium–Hard on CodeSignal/HackerRank. Trees, heaps, graphs, LRU-style design.",
+        focus: { dsa: 5, java: 4, sd: 4, behavioral: 5 },
+        javaNotes: "Java only for OA and onsite. Collections + concurrency (ExecutorService, ConcurrentHashMap). AWS SDK is Java-first — use in SD answers.",
+        sdNotes: "SDE II gets SD. Shopping cart, product catalog, order pipeline, warehouse system. Emphasize scalability + AWS.",
+        behavioral: "Leadership Principles = 50% of hire decision. EVERY answer in STAR tied to an LP.",
+        lps: ["Customer Obsession", "Ownership", "Invent and Simplify", "Bias for Action", "Dive Deep", "Deliver Results", "Learn and Be Curious", "Insist on Highest Standards"],
+        patterns: "Trees BFS/DFS, heaps Top-K, sliding window, graphs, LRU, two pointers, OOD",
+        planDays: "Weeks 1–5 · Week 6 Day 39 (Checkout) · Week 7 Day 44 Amazon LP sprint · Daily 15m LP stories",
+        mustDo: [["two-sum","Two Sum"],["lru-cache","LRU Cache"],["copy-list-with-random-pointer","Copy Random Pointer"],["number-of-islands","Number of Islands"],["top-k-frequent-elements","Top K Frequent"],["word-ladder","Word Ladder"],["merge-k-sorted-lists","Merge K Lists"],["trapping-rain-water","Trapping Rain Water"],["minimum-window-substring","Min Window Substring"],["serialize-and-deserialize-binary-tree","Serialize Tree"],["course-schedule","Course Schedule"],["kth-largest-element-in-an-array","Kth Largest"]],
+        tips: ["LP prep hours = coding prep hours — non-negotiable", "OA in Java — 100% test cases + optimal Big-O", "Implement LRU with LinkedHashMap in Java for design rounds", "Mention AWS Java SDK in SD when natural", "Prepare STAR stories for all 16 LPs"]
+      },
+      {
+        id: "companies-apple", abbr: "AAPL", name: "Apple", color: "#a2aaad",
+        role: "ICT / Software Engineer (Apple Cloud, Services, IS&T)",
+        process: "Recruiter → Phone screen → 3–5 onsite (coding + OOP + behavioral). OA less common for experienced.",
+        oa: "When given: 1–2 Medium on HackerRank. Emphasis on clean, readable code over clever tricks.",
+        focus: { dsa: 4, java: 5, sd: 3, behavioral: 4 },
+        javaNotes: "100% Java for backend interviews. Strong OOP — interfaces, abstract classes, design patterns (Factory, Singleton, Builder). Clean naming + JUnit-style test mentions.",
+        sdNotes: "iCloud sync, photo storage, App Store backend. Privacy-by-design is a talking point Apple loves.",
+        behavioral: "Collaboration, attention to detail, user privacy, passion for Apple products. Less aggressive than Amazon LP.",
+        lps: ["Why Apple?", "Privacy-first design example", "Cross-team collaboration", "Obsessive attention to detail", "Project you're most proud of", "Handling ambiguous requirements"],
+        patterns: "Arrays, strings, linked list, trees, hash maps, OOP design, clean code, medium DSA (not extreme hard)",
+        planDays: "Week 1 Java OOP · Week 5 concurrency · Week 6 Day 41 (iCloud) · Week 7 Day 45 Apple sprint",
+        mustDo: [["reverse-linked-list","Reverse LL"],["valid-parentheses","Valid Parentheses"],["two-sum","Two Sum"],["merge-two-sorted-lists","Merge Two Lists"],["maximum-depth-of-binary-tree","Max Depth"],["lru-cache","LRU Cache"],["group-anagrams","Group Anagrams"],["binary-search","Binary Search"],["best-time-to-buy-and-sell-stock","Best Time Buy/Sell"],["implement-queue-using-stacks","Queue using Stacks"],["invert-binary-tree","Invert Tree"],["contains-duplicate","Contains Duplicate"]],
+        tips: ["Code readability > micro-optimizations — write production-quality Java", "Know basic design patterns: Singleton, Factory, Observer", "Privacy: explain how you'd minimize data collection in designs", "Apple interviews feel conversational — stay calm and structured", "Research team: Apple Cloud vs Services vs Maps"]
+      },
+      {
+        id: "companies-netflix", abbr: "NFLX", name: "Netflix", color: "#e50914",
+        role: "Senior Software Engineer (L4/L5) — often mid+ level",
+        process: "Recruiter → 3–5 rounds: coding (2) + system design (1–2) + culture (1). No trick questions policy.",
+        oa: "Less common — live coding in shared doc. Practical Medium problems + deep SD.",
+        focus: { dsa: 4, java: 5, sd: 5, behavioral: 5 },
+        javaNotes: "Java + Spring Boot microservices stack. CompletableFuture, ExecutorService, HikariCP connection pool. Code every LC problem in Java.",
+        sdNotes: "Video streaming, CDN, recommendation, A/B testing infra. Microservices, event-driven, high availability.",
+        behavioral: "Netflix Culture Memo: Freedom & Responsibility, Keeper Test mindset, 360 feedback culture, no brilliant jerks.",
+        lps: ["Tell me about yourself (Netflix style — concise)", "A failure and what you learned", "Disagree and commit example", "High performer vs adequate performer", "Why Netflix?", "Design for 100M concurrent streams"],
+        patterns: "Medium DSA, concurrency, microservices SD, caching, CDN, event-driven, Java backend patterns",
+        planDays: "Week 5 Java concurrency · Week 6 Day 40 (Video Streaming) · Week 7 Day 46 Netflix SD sprint",
+        mustDo: [["lru-cache","LRU Cache"],["design-twitter","Design Twitter"],["task-scheduler","Task Scheduler"],["number-of-islands","Number of Islands"],["course-schedule","Course Schedule"],["merge-intervals","Merge Intervals"],["kth-largest-element-in-an-array","Kth Largest"],["word-break","Word Break"],["coin-change","Coin Change"],["rotting-oranges","Rotting Oranges"],["add-and-search-word-data-structure","Add Search Word"],["time-based-key-value-store","Time Based KV"]],
+        tips: ["Netflix hires senior — show ownership and end-to-end thinking", "SD > pure algorithm tricks — know streaming architecture cold", "Read Netflix tech blog (Chaos Monkey, Zuul, EVCache)", "Culture fit is real — prepare honest failure/feedback stories", "They value judgment: explain trade-offs, not just optimal code"]
+      },
+      {
+        id: "companies-google", abbr: "GOOG", name: "Google", color: "#4285f4",
+        role: "L3 / L4 Software Engineer",
+        process: "Recruiter → Phone screen (1 code) → Onsite (4–5: 2–3 coding + 1 Googleyness + 1 team match)",
+        oa: "CodeSignal (GCA) or phone screen. Medium–Hard: graphs, DP, binary search, greedy.",
+        focus: { dsa: 5, java: 4, sd: 4, behavioral: 4 },
+        javaNotes: "Java for all phone screens and onsites. java.util collections, Generics, Comparable/Comparator. Shared Google Doc — write Java without IDE autocomplete.",
+        sdNotes: "L4+ gets SD. Google Search, Maps, YouTube, Ads, Drive. Emphasis on scale (billions of queries) + consistency models.",
+        behavioral: "Googleyness: collaboration, ambiguity, growth mindset, intellectual humility. General Cognitive Ability (GCA) in OA.",
+        lps: ["Tell me about a challenging technical problem", "Worked with difficult teammate", "Googleyness — ambiguous project", "Why Google?", "Optimized something by 10x", "Learned new tech quickly"],
+        patterns: "Graphs, DP (hard), binary search on answer, heaps, tries, union-find, interval problems",
+        planDays: "Weeks 3–4 critical (trees/graphs/DP) · Week 6 Day 37 (Search) · Week 7 Day 47 Google hard sprint",
+        mustDo: [["word-ladder","Word Ladder"],["merge-k-sorted-lists","Merge K Lists"],["regular-expression-matching","Regex Matching"],["median-of-two-sorted-arrays","Median Two Arrays"],["longest-consecutive-sequence","Longest Consecutive"],["course-schedule-ii","Course Schedule II"],["word-search-ii","Word Search II"],["edit-distance","Edit Distance"],["burst-balloons","Burst Balloons"],["serialize-and-deserialize-binary-tree","Serialize Tree"],["minimum-window-substring","Min Window Substring"],["alien-dictionary","Alien Dictionary"]],
+        tips: ["Google has highest DSA bar — prioritize Hard mediums + select Hards", "Explain thinking on Google Doc / shared editor — no IDE autocomplete", "Team matching round: research Google products you care about", "Practice NeetCode Google 73 + LeetCode Google tag top 50", "Phone screen elimination rate is high — treat it like onsite"]
+      }
+    ];
+
+    function renderFocusBar(focus, color) {
+      const labels = [["DSA", focus.dsa], ["Java", focus.java], ["System Design", focus.sd], ["Behavioral", focus.behavioral]];
+      return labels.map(([l, v]) =>
+        `<div class="meta-pill"><strong>${l} priority</strong>${"●".repeat(v)}${"○".repeat(5-v)}
+          <div class="priority-bar">${[1,2,3,4,5].map(i => `<div class="priority-dot ${i<=v?"on":""}" style="${i<=v?`background:${color}`:""}"></div>`).join("")}</div></div>`
+      ).join("");
+    }
+
+    function renderCompaniesSection() {
+      let html = `<section id="companies">
+        <div class="week-header">
+          <h2>FAANG Company Roadmaps</h2>
+          <span class="phase-tag">Meta · Amazon · Apple · Netflix · Google</span>
+        </div>
+        <div class="overview-grid" style="margin-bottom:1.25rem">
+          <div class="overview-item"><strong>Weeks 1–5</strong>Shared FAANG base — Java + DSA (all 5 companies)</div>
+          <div class="overview-item"><strong>Week 6</strong>FAANG-specific system design cases</div>
+          <div class="overview-item"><strong>Week 7</strong>One sprint day per FAANG company</div>
+          <div class="overview-item"><strong>Day 50</strong>Full FAANG loop mock (2 code + 1 SD + behavioral)</div>
+        </div>
+        <h3 style="font-size:0.95rem;margin-bottom:0.75rem;color:#fbbf24">50-Day FAANG Timeline</h3>
+        <pre class="templates" style="margin-bottom:1.25rem">Days  1–7   100% Java boot — OOP · Collections · Streams
+Days  8–28  All DSA in Java — ListNode · ArrayDeque · HashMap
+Days 29–35  Java Expert — concurrency · Spring Boot · JDBC/JPA
+Days 29–35  Java Expert + SQL (Day 34)   → Backend + SD data layer
+Days 36–42  FAANG SD + database design   → Schema in every HLD
+Days  7·14·21·28·34  SQL/DBMS integrated throughout
+Days 43–49  FAANG Company Sprint          → Meta · AMZ · Apple · NFLX · GOOG
+Day   50    FAANG Graduation Loop         → Full interview simulation</pre>
+        <div class="company-grid">`;
+
+      companies.forEach(c => {
+        const probHtml = c.mustDo.map(([slug, name]) =>
+          `<a class="problem" href="${lc(slug)}" target="_blank" rel="noopener">${name}</a>`
+        ).join("");
+        const lpHtml = c.lps.map(l => `<li>${l}</li>`).join("");
+
+        html += `<div class="company-card" id="${c.id}" style="--company-color:${c.color}">
+          <div class="company-header" onclick="toggleCompany('${c.id}')">
+            <div class="company-logo">${c.abbr}</div>
+            <div style="flex:1">
+              <div class="company-title">${c.name}</div>
+              <div class="company-sub">${c.role}</div>
+            </div>
+            <span class="complexity-badge">${c.mustDo.length} must-do</span>
+            <span class="chevron">▼</span>
+          </div>
+          <div class="company-body">
+            <div class="company-meta">
+              <div class="meta-pill"><strong>Interview process</strong>${c.process}</div>
+              <div class="meta-pill"><strong>Online assessment</strong>${c.oa}</div>
+            </div>
+            <div class="company-meta">${renderFocusBar(c.focus, c.color)}</div>
+
+            <div class="company-section-title">Map to 50-day plan</div>
+            <p style="font-size:0.88rem;color:#c8d3e0">${c.planDays}</p>
+
+            <div class="company-section-title">Top patterns tested</div>
+            <p style="font-size:0.88rem;color:#c8d3e0">${c.patterns}</p>
+
+            <div class="company-section-title">Java focus</div>
+            <p style="font-size:0.88rem;color:#c8d3e0">${c.javaNotes}</p>
+
+            <div class="company-section-title">System design</div>
+            <p style="font-size:0.88rem;color:#c8d3e0">${c.sdNotes}</p>
+
+            <div class="company-section-title">Behavioral / HR</div>
+            <p style="font-size:0.88rem;color:#c8d3e0;margin-bottom:0.5rem">${c.behavioral}</p>
+            <ul class="lp-list">${lpHtml}</ul>
+
+            <div class="company-section-title">Must-do problems (solve blind)</div>
+            <div class="problems">${probHtml}</div>
+
+            <div class="company-section-title">Pro tips</div>
+            <ul class="lp-list">${c.tips.map(t => `<li>✓ ${t}</li>`).join("")}</ul>
+          </div>
+        </div>`;
+      });
+
+      html += `</div>
+        <h3 style="margin:1.5rem 0 0.75rem;font-size:1rem;">FAANG Cross-Company Matrix</h3>
+        <pre class="templates">                 Meta  Amazon  Apple  Netflix  Google
+DSA difficulty    ★★★★  ★★★★   ★★★    ★★★     ★★★★★
+System Design     ★★★★★ ★★★★   ★★★    ★★★★★   ★★★★
+Behavioral        ★★★★  ★★★★★  ★★★★   ★★★★★   ★★★★
+Java / OOP        ★★★★  ★★★★   ★★★★★  ★★★★★   ★★★★
+Graphs / BFS      ★★★★★ ★★★★   ★★★    ★★★     ★★★★★
+Dynamic Prog.     ★★★★  ★★★★   ★★★    ★★★     ★★★★★
+Leadership / LP   ★★★   ★★★★★  ★★★    ★★★★    ★★★
+
+Universal FAANG must-do: Two Sum · LRU Cache · Number of Islands ·
+  Course Schedule · Merge K Lists · Word Ladder · Min Window Substring</pre>
+      </section>`;
+      return html;
+    }
+
+    function toggleCompany(id) {
+      document.getElementById(id)?.classList.toggle("open");
+    }
+
+    function expandAllCompanies() {
+      document.querySelectorAll(".company-card").forEach(c => c.classList.add("open"));
+      document.getElementById("companies")?.scrollIntoView({ behavior: "smooth" });
+    }
+
+    const dbmsTopics = [
+      { name: "ACID Properties", body: "Atomicity (all or nothing), Consistency (valid state), Isolation (concurrent txs), Durability (committed = persisted). Foundation for SQL transactions in FAANG SD interviews." },
+      { name: "Normalization (1NF → 3NF)", body: "1NF: atomic columns. 2NF: no partial dependency on composite key. 3NF: no transitive dependency. Denormalize for read performance in SD — know trade-off." },
+      { name: "Keys & Constraints", body: "PRIMARY KEY, FOREIGN KEY, UNIQUE, NOT NULL, CHECK. Composite keys. Surrogate vs natural keys. Referential integrity ON DELETE CASCADE/SET NULL." },
+      { name: "Indexing", body: "B+ Tree index (default in Postgres/MySQL). Clustered vs non-clustered. Covering index. When index hurts writes. EXPLAIN / query plan. Connects to SD read scaling." },
+      { name: "Transactions & Isolation", body: "READ UNCOMMITTED → READ COMMITTED → REPEATABLE READ → SERIALIZABLE. Dirty read, non-repeatable read, phantom read. MVCC in Postgres." },
+      { name: "SQL vs NoSQL", body: "SQL: ACID, joins, structured (Postgres, MySQL). NoSQL: scale-out, flexible schema (DynamoDB, Cassandra, MongoDB). FAANG uses both — pick in SD by access pattern." },
+      { name: "Replication & Sharding", body: "Primary-replica for reads. Horizontal sharding by user_id/hash. Consistent hashing. Replication lag trade-offs — link to Week 6 SD." },
+      { name: "Query Optimization", body: "Avoid SELECT *. Index WHERE/JOIN columns. N+1 problem → JOIN or batch. Pagination: LIMIT/OFFSET vs keyset (cursor). Connection pooling (HikariCP in Java)." }
+    ];
+
+    const sqlPatterns = [
+      { name: "Basic SELECT + FILTER", trigger: "filter rows, sort, limit", code: "SELECT col1, col2 FROM table\nWHERE status = 'active'\nORDER BY created_at DESC\nLIMIT 10;" },
+      { name: "INNER / LEFT JOIN", trigger: "combine tables, find missing", code: "SELECT a.id, b.name\nFROM Orders a\nINNER JOIN Customers b ON a.customer_id = b.id;\n\n-- missing rows:\nSELECT c.* FROM Customers c\nLEFT JOIN Orders o ON c.id = o.customer_id\nWHERE o.id IS NULL;" },
+      { name: "GROUP BY + HAVING", trigger: "aggregate per group, filter groups", code: "SELECT dept_id, COUNT(*) AS cnt, AVG(salary) AS avg_sal\nFROM Employee\nGROUP BY dept_id\nHAVING COUNT(*) > 5;" },
+      { name: "Subquery & IN / EXISTS", trigger: "filter by another table's result", code: "SELECT name FROM Employee\nWHERE dept_id IN (SELECT id FROM Department WHERE loc = 'NY');\n\nSELECT d.name FROM Department d\nWHERE EXISTS (SELECT 1 FROM Employee e WHERE e.dept_id = d.id);" },
+      { name: "Window — ROW_NUMBER / RANK", trigger: "nth highest, rank, dedupe", code: "SELECT salary FROM (\n  SELECT salary, DENSE_RANK() OVER (ORDER BY salary DESC) AS rk\n  FROM Employee\n) t WHERE rk = 2;  -- 2nd highest" },
+      { name: "Window — LEAD / LAG", trigger: "compare with previous/next row", code: "SELECT id, recordDate, temperature,\n  LAG(temperature) OVER (ORDER BY recordDate) AS prev_temp\nFROM Weather;" },
+      { name: "Self JOIN", trigger: "employee-manager, compare same table", code: "SELECT e1.name AS Employee, e2.name AS Manager\nFROM Employee e1\nJOIN Employee e2 ON e1.managerId = e2.id;" },
+      { name: "UNION / CTE", trigger: "combine result sets, readable subqueries", code: "WITH dept_avg AS (\n  SELECT dept_id, AVG(salary) AS avg_sal FROM Employee GROUP BY dept_id\n)\nSELECT e.name, e.salary FROM Employee e\nJOIN dept_avg d ON e.dept_id = d.dept_id\nWHERE e.salary > d.avg_sal;" }
+    ];
+
+    const sqlMustDo = [
+      ["combine-two-tables","Combine Two Tables"],["second-highest-salary","Second Highest Salary"],
+      ["nth-highest-salary","Nth Highest Salary"],["duplicate-emails","Duplicate Emails"],
+      ["customers-who-never-order","Customers Who Never Order"],["department-highest-salary","Department Highest Salary"],
+      ["employees-earning-more-than-their-managers","Employees > Manager"],
+      ["rising-temperature","Rising Temperature"],["rank-scores","Rank Scores"],
+      ["consecutive-numbers","Consecutive Numbers"],["department-top-three-salaries","Dept Top 3 Salaries"],
+      ["article-views-i","Article Views I"],["monthly-transactions-i","Monthly Transactions I"],
+      ["immediate-food-delivery","Immediate Food Delivery"],["game-play-analysis-i","Game Play Analysis I"]
+    ];
+
+    function renderJavaStackSection() {
+      return `<section id="java-stack">
+        <div class="week-header">
+          <h2>Complete Java Stack — Interview Ready</h2>
+          <span class="phase-tag">100% Java · FAANG backend track</span>
+        </div>
+        <div class="java-banner" style="margin-bottom:1.25rem">
+          <strong>Golden rule:</strong> Set LeetCode → Java. Every DSA solution uses <code style="color:#fde68a">java.util</code> (ArrayList, HashMap, PriorityQueue, ArrayDeque). No ArrayList in Python, no vector in C++.
+        </div>
+        <div class="overview-grid">
+          <div class="overview-item"><strong>Week 1</strong>OOP · JVM · Collections · Streams</div>
+          <div class="overview-item"><strong>Week 5</strong>Concurrency · CompletableFuture</div>
+          <div class="overview-item"><strong>Week 5–6</strong>Spring Boot · JDBC · JPA</div>
+          <div class="overview-item"><strong>All weeks</strong>DSA coded in Java only</div>
+        </div>
+        <h3 style="font-size:0.95rem;margin:1.25rem 0 0.75rem;color:#fbbf24">Java Interview Topics (master all)</h3>
+        <pre class="templates">CORE LANGUAGE
+  OOP          → encapsulation, inheritance, polymorphism, abstraction
+  Interfaces   → vs abstract class (Java 8+ default methods)
+  Generics     → List&lt;T&gt;, bounded types, wildcards ? extends / ? super
+  equals/hashCode → contract for HashMap/HashSet keys
+  Comparable   → compareTo vs Comparator.comparingInt()
+
+COLLECTIONS (java.util) — use in every DSA problem
+  List         → ArrayList (default), LinkedList (Deque only)
+  Set          → HashSet, TreeSet, LinkedHashSet
+  Map          → HashMap, TreeMap, LinkedHashMap
+  Queue/Stack  → ArrayDeque (never java.util.Stack)
+  Heap         → PriorityQueue + custom Comparator
+
+MODERN JAVA (8 → 21)
+  Streams      → map, filter, flatMap, collect, groupingBy (cleanup only in LC)
+  Optional     → orElse, orElseGet, ifPresent
+  var          → local type inference (Java 10+)
+  Records      → immutable data carriers (Java 16+)
+  Sealed classes → restricted inheritance (Java 17+, awareness)
+
+JVM & MEMORY
+  Heap vs Stack → objects on heap, frames on stack
+  GC            → mark-sweep, G1 (default), when objects eligible
+  Memory leak   → static collections, unclosed resources
+
+CONCURRENCY (Week 5)
+  synchronized, volatile, Thread, Runnable
+  ExecutorService, Callable, Future
+  ConcurrentHashMap, BlockingQueue, CountDownLatch
+  CompletableFuture → supplyAsync, thenApply, thenCombine
+
+SPRING BOOT (SD + Netflix/HashedIn style)
+  @RestController, @Service, @Repository, @Autowired
+  REST API → GET/POST/PUT/DELETE + ResponseEntity
+  JPA/Hibernate → @Entity, @Id, @OneToMany
+  HikariCP → connection pool config
+  Maven → pom.xml dependencies
+
+TESTING & BUILD
+  JUnit 5     → @Test, assertEquals, @BeforeEach
+  Mockito     → mock dependencies (mention in interview)
+  Maven       → mvn clean install · mvn test
+
+DESIGN PATTERNS (implement in Java)
+  Singleton   → enum or double-checked locking
+  Factory     → interface + impl classes
+  Builder     → Lombok @Builder or manual
+  Strategy    → Comparator, lambda implementations
+
+EXCEPTIONS
+  Checked    → IOException (must handle)
+  Unchecked  → RuntimeException, NPE, IllegalArgumentException
+  try-with-resources → AutoCloseable (Java 7+)
+
+DATABASE (Java side)
+  JDBC       → Connection, PreparedStatement, ResultSet
+  JPA        → EntityManager, JPQL, Spring Data JpaRepository
+  SQL        → write queries; run from Java via JDBC or @Query</pre>
+        <h3 style="font-size:0.95rem;margin:1rem 0 0.75rem;color:#fbbf24">Java DSA File Template (use for every problem)</h3>
+        <pre class="templates">import java.util.*;
+
+class Solution {
+    public int[] twoSum(int[] nums, int target) {
+        Map&lt;Integer, Integer&gt; seen = new HashMap&lt;&gt;();
+        for (int i = 0; i &lt; nums.length; i++) {
+            int need = target - nums[i];
+            if (seen.containsKey(need)) return new int[]{seen.get(need), i};
+            seen.put(nums[i], i);
+        }
+        return new int[]{};
+    }
+}
+
+// Tree problems → class TreeNode { int val; TreeNode left, right; }
+// Graph BFS     → Queue&lt;Integer&gt; q = new ArrayDeque&lt;&gt;();
+// Graph DFS     → Deque&lt;Integer&gt; stack or recurse
+// Top-K         → PriorityQueue&lt;Integer&gt; minHeap = new PriorityQueue&lt;&gt;();</pre>
+        <h3 style="font-size:0.95rem;margin:1rem 0 0.75rem;color:#fbbf24">Java Oral Questions (FAANG loves these)</h3>
+        <pre class="templates">1. Difference between == and equals()?
+2. How does HashMap work internally? (buckets, hashCode, treeify)
+3. ArrayList vs LinkedList — when to use which?
+4. String vs StringBuilder vs StringBuffer?
+5. fail-fast vs fail-safe iterator (ConcurrentModificationException)
+6. synchronized vs ReentrantLock vs ConcurrentHashMap?
+7. What is garbage collection? Name one GC algorithm.
+8. Interface vs abstract class — Java 8 defaults?
+9. Checked vs unchecked exceptions with examples?
+10. How would you design a thread-safe Singleton in Java?</pre>
+      </section>`;
+    }
+
+    function renderDbmsSqlSection() {
+      let html = `<section id="dbms-sql">
+        <div class="week-header">
+          <h2>DBMS & SQL — Java Integration</h2>
+          <span class="phase-tag">JDBC · JPA · Spring Data · LeetCode SQL</span>
+        </div>
+        <div class="overview-grid" style="margin-bottom:1.25rem">
+          <div class="overview-item"><strong>Plan days</strong>7 · 14 · 21 · 28 · 34 · 36 · 49</div>
+          <div class="overview-item"><strong>Day 34</strong>Main SQL sprint — 10+ LC SQL problems</div>
+          <div class="overview-item"><strong>FAANG link</strong>SD data model + indexing in every HLD</div>
+          <div class="overview-item"><strong>Java link</strong>JDBC · JPA/Hibernate · HikariCP pool</div>
+          <div class="overview-item"><strong>Rule</strong>SQL runs on LeetCode; apps use Java + JDBC/JPA</div>
+        </div>
+        <h3 style="font-size:0.95rem;margin-bottom:0.75rem;color:#818cf8">DBMS Core Concepts</h3>
+        <div class="company-grid" style="margin-bottom:1.5rem">`;
+      dbmsTopics.forEach((t, i) => {
+        html += `<div class="pattern-card open" id="dbms-${i}">
+          <div class="pattern-header" onclick="togglePattern('dbms-${i}')">
+            <span class="pattern-num" style="color:#818cf8;background:rgba(129,140,248,0.12)">DB${i+1}</span>
+            <div class="pattern-meta"><div class="pattern-name">${t.name}</div></div>
+            <span class="chevron">▼</span>
+          </div>
+          <div class="pattern-body" style="display:block;padding-top:0.75rem">
+            <p style="font-size:0.88rem;color:#c8d3e0">${t.body}</p>
+          </div>
+        </div>`;
+      });
+      html += `</div>
+        <h3 style="font-size:0.95rem;margin-bottom:0.75rem;color:#2dd4bf">SQL Query Patterns (Interview + LeetCode)</h3>`;
+      sqlPatterns.forEach((p, i) => {
+        const codeEsc = p.code.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");
+        html += `<div class="pattern-card" id="sql-${i}">
+          <div class="pattern-header" onclick="togglePattern('sql-${i}')">
+            <span class="pattern-num" style="color:#2dd4bf;background:rgba(45,212,191,0.12)">SQL</span>
+            <div class="pattern-meta">
+              <div class="pattern-name">${p.name}</div>
+              <div class="pattern-trigger">"${p.trigger}"</div>
+            </div>
+            <span class="chevron">▼</span>
+          </div>
+          <div class="pattern-body">
+            <div class="code-label">Template</div>
+            <pre class="templates">${codeEsc}</pre>
+          </div>
+        </div>`;
+      });
+      html += `<h3 style="margin:1.5rem 0 0.75rem;font-size:1rem;">Must-Do LeetCode SQL (50 for FAANG readiness)</h3>
+        <div class="problems" style="margin-bottom:1rem">`;
+      sqlMustDo.forEach(([slug, name]) => {
+        html += `<a class="problem sql-link" href="${lcs(slug)}" target="_blank" rel="noopener">${name}</a>`;
+      });
+      html += `</div>
+        <pre class="templates">Java + DB connection (know for interviews):
+// JDBC pattern
+Connection conn = DriverManager.getConnection(url, user, pass);
+PreparedStatement ps = conn.prepareStatement("SELECT * FROM users WHERE id = ?");
+ps.setInt(1, userId);
+ResultSet rs = ps.executeQuery();
+
+FAANG SD — when interviewer asks "design the database":
+1. Entities + relationships (ER diagram)
+2. Schema (tables, PK, FK, indexes)
+3. Read vs write ratio → indexes + replicas
+4. Scale → sharding key choice
+5. SQL vs NoSQL justification</pre>
+      </section>`;
+      return html;
+    }
+
+        /* ── Interview Q&A bank (62 questions) ── */
+        const interviewBanks = [
+      {
+        id: "iq-why", title: "WHY? — Production Troubleshooting", color: "#ef4444", tag: "Prod",
+        items: [
+          { q: "Your API suddenly becomes slow after deployment. What would you check first?",
+            a: "<ul><li><strong>APM/traces first</strong> — p95 latency spike on which endpoint? (Micrometer, Datadog, Jaeger)</li><li>New deployment diff — config, JVM flags, connection pool size (HikariCP)</li><li>Downstream dependency slow? DB, Redis, external HTTP</li><li>DB: slow query log, missing index, connection wait time</li><li>Traffic spike vs capacity; CPU/memory/GC pauses on JVM</li><li>Compare prod vs staging: env vars, secrets, feature flags</li></ul>" },
+          { q: "Kafka consumers are healthy, but lag keeps increasing. Why?",
+            a: "<ul><li><strong>Produce rate &gt; consume rate</strong> — handlers too slow (blocking DB/HTTP in consumer thread)</li><li>Too few consumers vs partitions — max parallelism = partition count</li><li>Long processing → <code>max.poll.interval.ms</code> exceeded → rebalance storm</li><li>Poison message infinite retry; deserialization errors</li><li>Downstream bottleneck (DB writes); scale consumers or optimize handler</li><li>Check consumer group lag per partition in Kafka UI/CLI</li></ul>" },
+          { q: "Database connections start getting exhausted. What could be wrong?",
+            a: "<ul><li><strong>Connection leak</strong> — not closed; use try-with-resources on Connection/Session</li><li>HikariCP <code>maximumPoolSize</code> too small vs Tomcat/Jetty threads</li><li>Long-running transactions holding connections</li><li>Missing <code>@Transactional</code> boundaries or propagation mistakes</li><li>Slow queries block pool — add query timeout, index fixes</li><li>Enable HikariCP leak detection: <code>leakDetectionThreshold</code></li></ul>" },
+          { q: "One microservice becomes slow and affects the entire platform. How would you isolate it?",
+            a: "<ul><li><strong>Timeouts</strong> on RestTemplate/WebClient/Feign — never infinite wait</li><li><strong>Circuit breaker</strong> (Resilience4j) — fail fast when dependency unhealthy</li><li><strong>Bulkhead</strong> — separate thread pools per dependency</li><li>Async where possible; degrade gracefully (cached/default response)</li><li>Rate limiting at API gateway; kill switch / feature flag for bad service</li><li>Kubernetes: isolate with resource limits; stop routing via readiness probe</li></ul>" },
+          { q: "Retry logic creates duplicate transactions. How would you prevent it?",
+            a: "<ul><li><strong>Idempotency key</strong> — client sends <code>Idempotency-Key</code> header; server dedupes in Redis/DB</li><li>Idempotent consumer — store processed message ID (Kafka)</li><li>Database unique constraint on business key (orderId + operation)</li><li>At-least-once delivery + idempotent write design (UPSERT, conditional update)</li><li>Transactional outbox pattern for exactly-once semantics across services</li><li>Never retry non-idempotent POST without idempotency token</li></ul>" },
+          { q: "APIs work locally but fail in production. What would you investigate?",
+            a: "<ul><li>Environment variables, secrets, DB URLs, API keys (Spring <code>application-prod.yml</code>)</li><li>Network: firewall, security groups, VPC, DNS, SSL/TLS certs</li><li>Prod data volume — queries that work on 100 rows fail on 10M</li><li>IAM roles (AWS), service account (K8s), CORS, auth token issuer URL</li><li>Memory/CPU limits in container — OOMKilled</li><li>Logs + stack trace; compare request/response with local</li></ul>" },
+          { q: "Autoscaling adds more instances, but latency still increases. Why?",
+            a: "<ul><li><strong>Shared bottleneck</strong> — DB, Redis, Kafka, not the app tier</li><li>JVM cold start + warmup — new pods slow until JIT compiles</li><li>Load balancer uneven; sticky sessions hotspot</li><li>Cache stampede or retry storm after errors</li><li>External API rate limits hit with more instances</li><li>More instances = more DB connections → pool/DB max connections exceeded</li></ul>" },
+          { q: "Cache improves performance initially, then starts returning stale data.",
+            a: "<ul><li>TTL too long; no invalidation on write/update/delete</li><li>Cache-aside bug — update DB but forget to evict cache key</li><li>Local in-memory cache (Caffeine) per pod — inconsistent across instances</li><li>CDN/browser cache stale — wrong Cache-Control headers</li><li>Fix: write-through or evict on mutation; Redis pub/sub for cross-node invalidation</li></ul>" },
+          { q: "Thread pools become exhausted while CPU remains normal.",
+            a: "<ul><li>Threads <strong>blocked on I/O</strong> — DB, HTTP calls, locks — not using CPU</li><li>Pool too small for blocking work; all threads waiting</li><li>Deadlock or lock contention (check thread dump)</li><li>Fix: separate pools for IO vs CPU; async non-blocking (WebClient); increase pool with bounds; find blocking call</li><li><code>jstack</code> or VisualVM thread dump — see BLOCKED/WAITING states</li></ul>" },
+          { q: "Health checks pass, but users still report failures.",
+            a: "<ul><li><strong>Liveness ≠ readiness</strong> — app up but can't serve (DB down)</li><li>Health endpoint too shallow — returns UP without checking Redis/Kafka/DB</li><li>Partial rollout — some bad pods still receiving traffic</li><li>Health check path bypasses failing code path</li><li>Fix: Spring Actuator <code>/actuator/health</code> with dependency indicators; proper readiness probe</li></ul>" },
+          { q: "One slow database query starts affecting the whole application.",
+            a: "<ul><li>Shared HikariCP — one slow query holds connections; others wait</li><li>Row/table locks block other transactions</li><li>Missing index → full scan on large table</li><li>Fix: <code>statement_timeout</code>, kill query, add index, read replica for reads</li><li>Isolate: separate pool for heavy reports vs OLTP</li><li>Monitor: pg_stat_statements / slow query log</li></ul>" },
+          { q: "Circuit breakers are configured, but cascading failures still happen.",
+            a: "<ul><li>Breakers missing on some call paths; retries bypass breaker intent</li><li>Thresholds too lenient — breaker never opens</li><li>No timeout before breaker — threads exhausted first</li><li>Retry + breaker together amplify load (retry storm)</li><li>Fix: timeout → breaker → bulkhead → limited retry with backoff; fallbacks</li><li>Resilience4j: configure <code>CircuitBreaker</code>, <code>TimeLimiter</code>, <code>Retry</code> together</li></ul>" },
+          { q: "Logs exist everywhere, but tracing a request is still difficult.",
+            a: "<ul><li>No <strong>correlation/trace ID</strong> propagated across services</li><li>Use SLF4J MDC: <code>MDC.put(\"traceId\", id)</code> in every log line</li><li>OpenTelemetry / Micrometer Tracing + Jaeger/Zipkin</li><li>Pass <code>X-Trace-Id</code> header in RestTemplate/WebClient/Feign interceptors</li><li>Structured JSON logging (Logback) with traceId, spanId, userId</li></ul>" },
+          { q: "Message ordering breaks between asynchronous services.",
+            a: "<ul><li>Kafka: messages with same key go to same partition (ordered within partition)</li><li>Multiple consumers on same partition break order — use single consumer per partition</li><li>Retries reorder events — use sequence numbers + idempotent reorder buffer</li><li>Multiple topics without coordination — design saga with versioning</li><li>Fix: partition by entity ID (orderId, userId)</li></ul>" },
+          { q: "JVM memory usage slowly increases over time.",
+            a: "<ul><li><strong>Memory leak</strong> — static collections growing, listeners not removed, ThreadLocal not cleared</li><li>Classloader leak (hot redeploy in dev)</li><li>Metaspace growth — dynamic class generation (CGLIB proxies)</li><li>Diagnose: heap dump (jmap -dump), Eclipse MAT / VisualVM; compare dominator tree over time</li><li>Enable GC logging; watch Old Gen never releases after GC</li></ul>" },
+          { q: "APIs randomly return 500 errors without infrastructure alerts.",
+            a: "<ul><li>Application exceptions (NPE, timeout) — infra CPU/memory looks fine</li><li>Alert on <strong>5xx rate</strong> / error budget, not just pod health</li><li>Unhandled edge cases in prod data only</li><li>Intermittent downstream timeout</li><li>Fix: global @ControllerAdvice, Sentry, log stack traces with traceId; SLO alerts</li></ul>" },
+          { q: "A scheduled job starts running multiple times after scaling.",
+            a: "<ul><li><code>@Scheduled</code> runs on <strong>every instance</strong> — 3 pods = 3x execution</li><li>Fix: <strong>ShedLock</strong> with JDBC/Redis lock</li><li>Kubernetes CronJob (single pod) instead of in-app scheduler</li><li>Quartz cluster mode; leader election (Curator/Zookeeper)</li><li>Redis SETNX distributed lock before job body</li></ul>" },
+          { q: "Distributed tracing disappears during production incidents.",
+            a: "<ul><li>Head-based sampling drops traces under high load — switch tail-based sampling</li><li>Tracing backend (Jaeger) overloaded/down</li><li>Instrumentation overhead disabled in panic</li><li>Always sample errors and high-latency spans</li><li>Ensure trace context propagated even on error paths</li></ul>" },
+          { q: "The application works for hours and suddenly becomes unstable.",
+            a: "<ul><li>Memory/connection leak reaching limit after hours</li><li>Disk full (logs); GC thrashing</li><li>Thread pool queue unbounded growth</li><li>Scheduled job pileup; DB connection pool starvation</li><li>External dependency degradation cascade</li><li>Check metrics over time — not just point-in-time</li></ul>" },
+          { q: "A deployment suddenly increases 4xx errors instead of 5xx errors.",
+            a: "<ul><li><strong>4xx = client/request issue</strong> — not server crash</li><li>API contract change — validation stricter (@Valid rejects old payloads)</li><li>Auth: token format, expired JWT, wrong scope (401/403)</li><li>Routing/version mismatch — /v2 vs /v1</li><li>WAF/API gateway new rules; rate limiting (429)</li><li>Compare 4xx breakdown by status code in logs/metrics</li></ul>" }
+        ]
+      },
+      {
+        id: "iq-java", title: "Core Java", color: "#fbbf24", tag: "Java",
+        items: [
+          { q: "How to sort a Map in Java?",
+            a: "By keys: <code>new TreeMap&lt;&gt;(map)</code>. By values: stream sorted entries.",
+            code: "Map<String, Integer> map = new HashMap<>();\n// sort by value desc\nList<Map.Entry<String,Integer>> sorted = map.entrySet().stream()\n    .sorted(Map.Entry.<String,Integer>comparingByValue().reversed())\n    .collect(Collectors.toList());\n// or TreeMap for sorted keys\nMap<String, Integer> byKey = new TreeMap<>(map);" },
+          { q: "Write a Singleton class in Java.",
+            a: "Best: enum singleton (Josh Bloch). Interview: double-checked locking or static holder.",
+            code: "// Best — thread-safe, serialization-safe\npublic enum Singleton {\n    INSTANCE;\n    public void doWork() { }\n}\n\n// Lazy — static holder\nclass Singleton {\n    private Singleton() {}\n    private static class Holder { static final Singleton I = new Singleton(); }\n    public static Singleton getInstance() { return Holder.I; }\n}" },
+          { q: "Difference between Comparable and Comparator?",
+            a: "<ul><li><strong>Comparable</strong> — natural order inside class; <code>compareTo()</code>; one sort order; <code>TreeSet</code>, <code>Collections.sort()</code></li><li><strong>Comparator</strong> — external; <code>compare(a,b)</code>; multiple sort orders; lambda: <code>Comparator.comparingInt(User::getAge)</code></li><li>Comparable: <code>class User implements Comparable&lt;User&gt;</code></li></ul>" },
+          { q: "New features in Java 7, 8, 11, and 17?",
+            a: "<ul><li><strong>Java 7:</strong> try-with-resources, diamond &lt;&gt;, NIO.2 (Files), multi-catch</li><li><strong>Java 8:</strong> Lambdas, Streams, Optional, default methods, new Date/Time API</li><li><strong>Java 11:</strong> HTTP Client, var (local), String methods, removed JavaEE modules</li><li><strong>Java 17 (LTS):</strong> Sealed classes, pattern matching for switch, records</li></ul>" },
+          { q: "What is try-with-resources?",
+            a: "Auto-closes resources implementing AutoCloseable. Replaces finally block for Closeable resources.",
+            code: "try (Connection conn = DriverManager.getConnection(url);\n     PreparedStatement ps = conn.prepareStatement(sql)) {\n    ResultSet rs = ps.executeQuery();\n    // use rs\n} // conn and ps closed automatically" },
+          { q: "What is multi-catch in Java?",
+            a: "Catch multiple exception types in one block (Java 7+). Exception must be unrelated (no subclass overlap).",
+            code: "try {\n    // code\n} catch (IOException | SQLException e) {\n    log.error(\"Failed\", e);\n}" },
+          { q: "What is Runnable and Callable?",
+            a: "<ul><li><strong>Runnable</strong> — <code>void run()</code>; no return; no checked exception</li><li><strong>Callable</strong> — <code>V call()</code> returns value; throws Exception; used with ExecutorService.submit()</li><li>Both executed by Thread or thread pool</li></ul>",
+            code: "ExecutorService pool = Executors.newFixedThreadPool(4);\nFuture<Integer> f = pool.submit(() -> 42);\nint result = f.get();" },
+          { q: "Types of exceptions. Exception hierarchy in Java.",
+            a: "<ul><li><strong>Throwable</strong> → Error (unchecked, don't catch) | Exception</li><li><strong>Exception</strong> → RuntimeException (unchecked: NPE, IllegalArgument) | checked (IOException, SQLException)</li><li>Checked: must handle or declare throws</li><li>Unchecked: RuntimeException subclasses — compiler doesn't force catch</li></ul>" },
+          { q: "What are different Design Patterns in Java?",
+            a: "<ul><li><strong>Creational:</strong> Singleton, Factory, Builder, Prototype</li><li><strong>Structural:</strong> Adapter, Decorator, Proxy, Facade</li><li><strong>Behavioral:</strong> Strategy, Observer, Template Method, Command</li><li>Spring uses: Factory (BeanFactory), Proxy (AOP), Template (JdbcTemplate), Singleton (beans default scope)</li></ul>" },
+          { q: "Explain OOP in Java.",
+            a: "<ul><li><strong>Encapsulation</strong> — private fields + getters/setters</li><li><strong>Inheritance</strong> — extends, code reuse; IS-A relationship</li><li><strong>Polymorphism</strong> — method overriding, interface impl; reference type vs object type</li><li><strong>Abstraction</strong> — abstract class, interface; hide implementation</li></ul>" },
+          { q: "ConcurrentHashMap internals.",
+            a: "<ul><li>Java 8+: array of buckets like HashMap; synchronized only on bucket head (not whole map)</li><li>CAS + synchronized for put; no Segment locks (pre-Java 8)</li><li>size() approximate under concurrency</li><li>Null key/value not allowed; thread-safe without locking entire map</li><li>Use instead of Hashtable or synchronized HashMap</li></ul>" },
+          { q: "How does Java garbage collection work?",
+            a: "<ul><li>Objects on heap; unreachable objects eligible for GC (no reference chain from GC roots)</li><li>Generational: Young Gen (Eden + Survivor), Old Gen</li><li>Minor GC (young), Major/Full GC (old)</li><li><strong>G1</strong> (default Java 9+): region-based, predictable pauses</li><li>Tuning: -Xmx, -Xms; avoid System.gc(); watch GC logs for pause times</li></ul>" }
+        ]
+      },
+      {
+        id: "iq-dsa", title: "DSA / Coding", color: "#60a5fa", tag: "DSA",
+        items: [
+          { q: "Find duplicate strings in a list of strings.",
+            code: "List<String> dupes = list.stream()\n    .collect(Collectors.groupingBy(s -> s, Collectors.counting()))\n    .entrySet().stream().filter(e -> e.getValue() > 1)\n    .map(Map.Entry::getKey).collect(Collectors.toList());\n// or Set: if (!seen.add(s)) duplicate",
+            lc: ["find-all-duplicates-in-an-array","contains-duplicate"] },
+          { q: "Check if a string is a palindrome.",
+            code: "boolean isPalindrome(String s) {\n    int lo = 0, hi = s.length() - 1;\n    while (lo < hi) {\n        if (s.charAt(lo++) != s.charAt(hi--)) return false;\n    }\n    return true;\n}",
+            lc: ["valid-palindrome"] },
+          { q: "Combination Sum II (recursion / backtracking).",
+            a: "Sort array; backtrack with start index; skip duplicate values at same level.",
+            lc: ["combination-sum-ii"] },
+          { q: "Remove odds, multiply by constant, sum — using Java Streams.",
+            code: "int sum = Arrays.stream(nums)\n    .filter(n -> n % 2 == 0)\n    .map(n -> n * K)\n    .sum();" },
+          { q: "Missing integer in consecutive array.",
+            code: "long n = arr.length;\nlong expected = n * (n + 1) / 2;\nlong actual = 0;\nfor (int x : arr) actual += x;\nreturn (int)(expected - actual); // or XOR all indices+values",
+            lc: ["missing-number","first-missing-positive"] },
+          { q: "Move all zeroes to the end of an array.",
+            code: "int w = 0;\nfor (int r = 0; r < nums.length; r++)\n    if (nums[r] != 0) nums[w++] = nums[r];\nwhile (w < nums.length) nums[w++] = 0;",
+            lc: ["move-zeroes"] },
+          { q: "Check if two strings are anagrams.",
+            code: "int[] freq = new int[26];\nfor (char c : s.toCharArray()) freq[c-'a']++;\nfor (char c : t.toCharArray()) if (--freq[c-'a'] < 0) return false;\nreturn true;",
+            lc: ["valid-anagram","group-anagrams"] },
+          { q: "Longest common prefix among strings.",
+            code: "String prefix = strs[0];\nfor (int i = 1; i < strs.length; i++) {\n    while (!strs[i].startsWith(prefix))\n        prefix = prefix.substring(0, prefix.length() - 1);\n}",
+            lc: ["longest-common-prefix"] },
+          { q: "Longest increasing subsequence.",
+            a: "DP O(n²) or patience sorting with binary search O(n log n).",
+            lc: ["longest-increasing-subsequence"] },
+          { q: "Best time to buy and sell stock (maximize profit).",
+            code: "int min = Integer.MAX_VALUE, profit = 0;\nfor (int p : prices) {\n    min = Math.min(min, p);\n    profit = Math.max(profit, p - min);\n}",
+            lc: ["best-time-to-buy-and-sell-stock"] },
+          { q: "Dijkstra's algorithm.",
+            a: "Shortest path weighted graph. PriorityQueue by distance. Relax neighbors.",
+            lc: ["network-delay-time"] },
+          { q: "Coin change (minimum coins).",
+            a: "Unbounded knapsack DP: dp[amount] = min coins.",
+            lc: ["coin-change"] },
+          { q: "Reverse-add palindrome problem.",
+            a: "Repeat: add reversed number until palindrome. Simulate with long/BigInteger for overflow.",
+            lc: ["reverse-integer","palindrome-number"] }
+        ]
+      },
+      {
+        id: "iq-web", title: "Web / Frameworks (Spring)", color: "#34d399", tag: "Spring",
+        items: [
+          { q: "Difference between REST and SOAP?",
+            a: "<ul><li><strong>REST</strong> — architectural style; HTTP verbs; JSON/XML; stateless; lightweight; Spring @RestController</li><li><strong>SOAP</strong> — protocol; XML envelope; WSDL; WS-Security; heavier; enterprise legacy</li><li>Modern Java microservices almost always REST/JSON</li></ul>" },
+          { q: "What is Spring?",
+            a: "<ul><li>Enterprise Java framework — IoC container manages bean lifecycle</li><li>Modules: Core, MVC, Data, Security, Boot</li><li>Central idea: Inversion of Control — framework creates and wires objects</li><li>Beans defined via @Component, @Service, @Repository, @Controller</li></ul>" },
+          { q: "Why do we use Spring?",
+            a: "<ul><li><strong>Dependency Injection</strong> — loose coupling, testable (@Autowired, constructor injection preferred)</li><li>AOP, declarative transaction management (@Transactional)</li><li>Rich ecosystem: Spring Boot, Spring Data JPA, Spring Security</li><li>Avoid boilerplate: no manual object wiring; production-ready defaults with Boot</li></ul>" },
+          { q: "Difference between Spring and Spring Boot?",
+            a: "<ul><li><strong>Spring</strong> — core framework; manual config (XML/Java config)</li><li><strong>Spring Boot</strong> — opinionated auto-configuration, embedded Tomcat, starters, Actuator</li><li>Boot: <code>@SpringBootApplication</code> = @Configuration + @EnableAutoConfiguration + @ComponentScan</li><li>Production-ready defaults — less boilerplate</li></ul>" },
+          { q: "How does autowiring work in Spring?",
+            a: "<ul><li>Container finds matching bean by type (and qualifier/name)</li><li><strong>Constructor injection</strong> — recommended; immutable, testable</li><li>@Autowired on constructor/field/setter; @Qualifier for multiple impls</li><li>@Primary marks default bean</li></ul>" },
+          { q: "What is Spring Security?",
+            a: "<ul><li>Authentication + authorization framework</li><li>Filter chain; JWT/OAuth2 resource server; form login</li><li>@PreAuthorize, Role-based access</li><li>Integrates with Spring Boot via spring-boot-starter-security</li></ul>" },
+          { q: "What is a RESTful API?",
+            a: "<ul><li>Resources as nouns (/users/{id}); HTTP methods: GET read, POST create, PUT replace, PATCH update, DELETE remove</li><li>Stateless; status codes (200, 201, 400, 401, 404, 500)</li><li>Spring: @GetMapping, @PostMapping + ResponseEntity&lt;T&gt;</li></ul>" },
+          { q: "Difference between HTTP and HTTPS?",
+            a: "<ul><li><strong>HTTP</strong> — plain text over TCP port 80</li><li><strong>HTTPS</strong> — HTTP + TLS/SSL encryption + certificate; port 443</li><li>HTTPS prevents MITM, required for auth tokens, PCI, production APIs</li></ul>" }
+        ]
+      },
+      {
+        id: "iq-sd", title: "System Design", color: "#a78bfa", tag: "SD",
+        items: [
+          { q: "Explain the design of one of your recent projects.",
+            a: "<ul><li>Use HLD framework: problem → scale (QPS, users) → API → Java Spring services → DB schema → diagram</li><li>Mention: REST endpoints, PostgreSQL tables, Redis cache, Kafka events</li><li>Trade-offs you made; what you'd improve at 10x scale</li><li>Connect to your resume — be specific with metrics</li></ul>" },
+          { q: "Design a fraud detection model for transactions.",
+            a: "<ul><li>Real-time stream: Kafka → rules engine + ML scoring service (Java/Spring)</li><li>Features: velocity, geo, device fingerprint, amount anomaly</li><li>Store: Redis for recent tx per user; PostgreSQL for rules; model in SageMaker/custom</li><li>Actions: allow / challenge / block; idempotent txId; audit log</li></ul>" },
+          { q: "Database design for ride-sharing (Uber).",
+            a: "<ul><li>Entities: User, Driver, Ride, Location, Payment</li><li>Rides sharded by city or geohash; driver location in Redis/Geospatial index</li><li>Matching service reads nearby drivers; trip state machine (requested→accepted→completed)</li><li>Java microservices: UserService, TripService, PaymentService; Kafka for events</li></ul>" },
+          { q: "Data warehouse for an online retailer.",
+            a: "<ul><li>OLTP (PostgreSQL orders) → ETL/CDC (Debezium/Kafka) → warehouse (BigQuery/Snowflake/Redshift)</li><li>Star schema: fact_orders, dim_product, dim_customer, dim_date</li><li>Batch (nightly) + streaming for near-real-time dashboards</li><li>Java: Spring Batch for ETL jobs</li></ul>" },
+          { q: "Design a news aggregator.",
+            a: "<ul><li>Crawlers fetch RSS/API → Kafka → indexing (Elasticsearch) + PostgreSQL metadata</li><li>User feed: fan-out on read with ranking (recency + interest)</li><li>Cache hot articles Redis; CDN for images</li><li>Java: Spring Boot services — Ingestion, Feed, Search</li></ul>" }
+        ]
+      },
+      {
+        id: "iq-server", title: "Server / System (JVM)", color: "#f472b6", tag: "JVM",
+        items: [
+          { q: "How to find server crash reasons?",
+            a: "<ul><li>Application logs (Logback/Log4j2) — stack trace at crash time</li><li><code>dmesg</code> / syslog — OOMKiller (Java process killed)</li><li>Kubernetes: <code>kubectl describe pod</code> — OOMKilled, exit code 137</li><li>hs_err_pid file (JVM fatal error); core dump analysis</li><li>Spring Actuator /health and metrics before crash</li></ul>" },
+          { q: "How to find server memory usage?",
+            a: "<ul><li>OS: <code>free -h</code>, <code>top</code>, <code>htop</code></li><li>JVM: VisualVM, JConsole, Micrometer metrics (jvm.memory.used)</li><li><code>jcmd &lt;pid&gt; VM.native_memory summary</code></li><li>Kubernetes: kubectl top pod; container memory limits vs usage</li></ul>" },
+          { q: "How do you debug high CPU or memory issues in JVM?",
+            a: "<ul><li><strong>CPU:</strong> <code>top -H -p &lt;pid&gt;</code> → thread ID → <code>jstack</code> → hex nid find hot thread</li><li><strong>Memory:</strong> heap dump <code>jmap -dump:live,format=b,file=heap.hprof &lt;pid&gt;</code> → MAT</li><li>Async-profiler, JFR (Java Flight Recorder) for flame graphs</li><li>Check GC logs; frequent Full GC = memory pressure</li></ul>" },
+          { q: "How do you capture heap/thread dumps?",
+            a: "<ul><li><strong>Heap:</strong> <code>jmap -dump:live,format=b,file=heap.hprof &lt;pid&gt;</code> or kill -3 (some JVMs)</li><li><strong>Thread:</strong> <code>jstack -l &lt;pid&gt; &gt; threads.txt</code> or <code>jcmd &lt;pid&gt; Thread.print</code></li><li>Spring Actuator: /actuator/threaddump, /actuator/heapdump</li><li>Kubernetes: jattach sidecar or ephemeral debug container</li></ul>" }
+        ]
+      }
+    ];
+
+    function renderInterviewSection() {
+      if (!interviewBanks || !interviewBanks.length) return "";
+      let html = `<section id="interview-qa">
+        <div class="week-header">
+          <h2>Interview Q&A Bank — 100% Java</h2>
+          <span class="phase-tag">62 questions · Prod · Java · DSA · Spring · SD · JVM</span>
+        </div>
+        <div class="pattern-toolbar">
+          <input class="pattern-search" id="iqSearch" placeholder="Search interview questions..." oninput="searchInterview(this.value)" />
+        </div>`;
+
+      let total = 0;
+      interviewBanks.forEach(bank => {
+        html += `<div class="pattern-category iq-bank" id="${bank.id}"><h3 style="color:${bank.color}">${bank.title}</h3>`;
+        bank.items.forEach(item => {
+          total++;
+          const iid = `iq-${total}`;
+          const search = (item.q + (item.a||"") + bank.title).toLowerCase().replace(/<[^>]+>/g," ");
+          let body = "";
+          if (item.a) body += `<div class="iq-answer">${item.a}</div>`;
+          if (item.code) {
+            const esc = item.code.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");
+            body += `<div class="code-label">Java</div><pre class="templates">${esc}</pre>`;
+          }
+          if (item.lc) {
+            body += `<div class="problems" style="margin-top:0.5rem">`;
+            item.lc.forEach(slug => {
+              body += `<a class="problem" href="https://leetcode.com/problems/${slug}/" target="_blank" rel="noopener">${slug}</a>`;
+            });
+            body += `</div>`;
+          }
+          html += `<div class="pattern-card iq-card" id="${iid}" data-search="${search}">
+            <div class="pattern-header" onclick="togglePattern('${iid}')" role="button" tabindex="0"
+                 onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();togglePattern('${iid}')}">
+              <span class="pattern-num" style="color:${bank.color};background:${bank.color}22">${bank.tag}</span>
+              <div class="pattern-meta"><div class="pattern-name">${item.q}</div></div>
+              <span class="chevron">▼</span>
+            </div>
+            <div class="pattern-body">${body}</div>
+          </div>`;
+        });
+        html += `</div>`;
+      });
+      html += `</section>`;
+      return html;
+    }
+
+    function searchInterview(q) {
+      const s = q.toLowerCase().trim();
+      document.querySelectorAll(".iq-card").forEach(card => {
+        card.classList.toggle("hidden", s && !card.dataset.search.includes(s));
+      });
+      document.querySelectorAll(".iq-bank").forEach(bank => {
+        const visible = bank.querySelectorAll(".iq-card:not(.hidden)").length;
+        bank.style.display = visible ? "" : "none";
+      });
+    }
+
+    function expandAllInterview() {
+      document.querySelectorAll(".iq-card").forEach(c => c.classList.add("open"));
+      document.getElementById("interview-qa")?.scrollIntoView({ behavior: "smooth" });
+    }
+
+    function renderReferenceSection() {
+      return `<section id="reference">
+        <div class="week-header"><h2>Quick Reference</h2><span class="phase-tag">Expert checklist</span></div>
+        <div class="overview-grid">
+          <div class="overview-item"><strong>3-hour daily block</strong>Learn 60m · Practice 90m · Log 15m · Review 15m</div>
+          <div class="overview-item"><strong>Week 4 target</strong>~160 LC problems</div>
+          <div class="overview-item"><strong>Week 6</strong>6 FAANG-specific SD cases</div>
+          <div class="overview-item"><strong>Week 7</strong>One sprint day per FAANG company</div>
+          <div class="overview-item"><strong>Day 50</strong>Full FAANG loop: 2 code + 1 SD + behavioral</div>
+          <div class="overview-item"><strong>100% Java</strong>All LC · SD · concurrency · Spring</div>
+          <div class="overview-item"><strong>Hardest bar</strong>Google DSA · Amazon LP · Netflix SD</div>
+        </div>
+        <h3 style="margin:1.25rem 0 0.5rem;font-size:1rem;">Java-Only Interview Rules</h3>
+        <pre class="templates">LeetCode     → Language: Java (always)
+Collections  → ArrayList, HashMap, PriorityQueue, ArrayDeque (never Stack)
+Strings      → charAt(), toCharArray(), StringBuilder for concat in loops
+Trees/Graphs → TreeNode, Map&lt;Integer,List&lt;Integer&gt;&gt; adjacency
+Concurrency  → ExecutorService, ConcurrentHashMap, synchronized
+SD backend   → Spring Boot REST + JPA entities + HikariCP
+SQL          → LeetCode SQL tab + JDBC/JPA from Java app
+Streams      → post-solve cleanup only — loops for core DSA logic</pre>
+        <h3 style="margin:1.25rem 0 0.5rem;font-size:1rem;">Java Collections Cheat Sheet</h3>
+        <pre class="templates">HashMap      → frequency, two-sum, graph adjacency O(1) avg
+TreeMap      → sorted keys, floorKey/ceilingKey O(log n)
+HashSet      → dedup, cycle detection in graph
+TreeSet      → sorted set, sliding window max/min
+PriorityQueue→ top-K, merge K, Dijkstra O(log n)
+ArrayDeque   → stack (push/pop) + queue (offer/poll) — prefer over Stack
+LinkedHashMap→ LRU cache (accessOrder=true)
+ArrayList    → default list; O(1) get, O(1) amortized append
+Arrays.sort  → O(n log n); Comparator.comparingInt(a -> a[0])</pre>
+        <h3 style="margin:1.25rem 0 0.5rem;font-size:1rem;">Pattern Recognition Flow</h3>
+        <pre class="templates">Sorted array + pair/triplet?     → Two Pointers / Binary Search
+Subarray/substring constraint?   → Sliding Window or Prefix+Hash
+Tree/graph traversal?            → DFS (recurse/stack) or BFS (queue)
+All combinations/permutations?   → Backtracking
+Optimal substructure + overlap?  → Dynamic Programming
+Top K / merge sorted streams?    → Heap (PriorityQueue)
+Sorted order + range queries?    → TreeMap / TreeSet
+Prefix of strings?               → Trie
+Connected components / cycles?   → Union Find or DFS
+Weighted shortest path?          → Dijkstra + PriorityQueue
+
+System Design quick picks:
+User-facing read-heavy?          → Cache-Aside + CDN + Read replicas
+Write-heavy events?              → Message queue + async workers
+Unique keys at scale?            → Snowflake ID / UUID + sharding
+Real-time chat/notifications?    → WebSocket + Pub/Sub backplane
+Search/autocomplete?             → Trie (DSA) + Elasticsearch (SD)</pre>
+        <h3 style="margin:1.25rem 0 0.5rem;font-size:1rem;">Day 50 — FAANG Graduation Checklist</h3>
+        <pre class="templates">☐ 55 DSA patterns — recognize in &lt; 2 min
+☐ 240+ LC logged · Medium solo ≥ 75% in 25 min
+☐ Meta must-do 12 · Amazon must-do 12 · Google must-do 12 — 70%+ blind
+☐ 6 FAANG SD cases cold (Search, Feed, Checkout, Streaming, iCloud, URL Shortener)
+☐ Amazon: 8+ LP STAR stories · Netflix: culture memo stories · Google: Googleyness stories
+☐ LRU + Trie + Union-Find — implement cold in Java
+☐ Full 3-hr FAANG loop mock passed solo
+☐ 25+ LeetCode SQL solved · window functions + JOINs blind
+☐ Explain ACID, indexing, normalization, SQL vs NoSQL in SD
+☐ Java oral: HashMap internals, == vs equals, GC, synchronized vs ConcurrentHashMap
+☐ Spring Boot: Controller/Service/Repository layers explained
+☐ 10 Java oral questions from #java-stack — answer without notes</pre>
+        <h3 style="margin:1.25rem 0 0.5rem;font-size:1rem;">SQL Quick Cheat Sheet</h3>
+        <pre class="templates">JOIN types     → INNER (match both) · LEFT (all left + match) · SELF (same table)
+Aggregation    → COUNT · SUM · AVG · MIN · MAX  +  GROUP BY · HAVING
+Nth highest    → DENSE_RANK() OVER (ORDER BY col DESC) = N
+Previous row   → LAG(col) OVER (PARTITION BY x ORDER BY y)
+Duplicates     → GROUP BY email HAVING COUNT(*) > 1
+Missing rows   → LEFT JOIN ... WHERE right.id IS NULL
+Date filter    → WHERE recordDate = DATE_ADD(prev, INTERVAL 1 DAY)  -- LC style
+
+Index when     → WHERE columns · JOIN keys · ORDER BY columns
+Skip index when → small table · low selectivity · write-heavy column</pre>
+      </section>`;
+    }
+
+    function filterPatterns(cat) {
+      patternFilter = cat;
+      document.querySelectorAll(".cat-chip").forEach(c => {
+        c.classList.toggle("active", c.dataset.cat === cat);
+      });
+      applyPatternFilters();
+    }
+
+    function searchPatterns(q) {
+      patternSearch = q.toLowerCase().trim();
+      applyPatternFilters();
+    }
+
+    function applyPatternFilters() {
+      document.querySelectorAll(".pattern-card").forEach(card => {
+        const matchCat = patternFilter === "all" || card.dataset.category === patternFilter;
+        const matchSearch = !patternSearch || card.dataset.search.includes(patternSearch);
+        card.classList.toggle("hidden", !(matchCat && matchSearch));
+      });
+      document.querySelectorAll(".pattern-category").forEach(cat => {
+        const visible = cat.querySelectorAll(".pattern-card:not(.hidden)").length;
+        cat.style.display = visible ? "" : "none";
+      });
+    }
+
+    function togglePattern(id) {
+      document.getElementById(id)?.classList.toggle("open");
+    }
+
+    function expandAllPatterns() {
+      document.querySelectorAll(".pattern-card").forEach(c => c.classList.add("open"));
+      document.getElementById("patterns")?.scrollIntoView({ behavior: "smooth" });
+    }
+
+    function expandAllSd() {
+      document.querySelectorAll(".sd-card").forEach(c => c.classList.add("open"));
+      document.getElementById("sd-patterns")?.scrollIntoView({ behavior: "smooth" });
+    }
+
+    const plan = [
+      {
+        id: "week1", title: "Week 1 — Java Foundation + DSA", phase: "Days 1–7 · 100% Java · Collections boot",
+        days: [
+          {
+            day: 1, title: "Java OOP + JVM Basics", track: "java",
+            java: "Classes, objects, inheritance, polymorphism, interfaces, abstract classes. JVM: bytecode, heap vs stack, garbage collection overview.",
+            learn: "Big-O notation — time/space complexity. Best, average, worst case.",
+            drill: "Write a Java class hierarchy: Shape → Circle, Rectangle with area(). Draw JVM memory diagram.",
+            problems: [["two-sum","Two Sum"],["contains-duplicate","Contains Duplicate"]],
+            exit: "Explain OOP pillars + why Java is platform-independent"
+          },
+          {
+            day: 2, title: "Collections Framework Deep Dive", track: "java",
+            java: "List, Set, Map hierarchy. ArrayList vs LinkedList. HashMap internals (buckets, load factor). TreeMap ordering. equals() + hashCode() contract.",
+            learn: "When to pick HashMap vs TreeMap vs LinkedHashMap",
+            drill: "Extend h1.java — same data in HashMap, TreeMap, LinkedHashMap; print iteration order",
+            problems: [["valid-anagram","Valid Anagram"],["group-anagrams","Group Anagrams"]],
+            exit: "Explain HashMap put/get step-by-step"
+          },
+          {
+            day: 3, title: "Streams API + Generics", track: "java",
+            java: "Stream pipeline: map, filter, flatMap, collect, groupingBy, reduce. Generics: List<T>, bounded types. Optional for null safety.",
+            learn: "Streams for transforms; loops for indexed DSA problems",
+            drill: "Word frequency with HashMap AND stream groupingBy. Top 3 longest words with streams.",
+            problems: [["top-k-frequent-elements","Top K Frequent"],["sort-characters-by-frequency","Sort Chars Frequency"]],
+            exit: "Write 3 stream pipelines from memory"
+          },
+          {
+            day: 4, title: "Arrays + Two Pointers (Java)", track: "dsa",
+            java: "Use int[], ArrayList<Integer>, Arrays.sort(), Collections. LeetCode language = Java.",
+            learn: "Prefix sum, difference array intro. Two pointers on sorted array.",
+            drill: "Write prefix sum + two pointer templates on paper",
+            problems: [["best-time-to-buy-and-sell-stock","Best Time Buy/Sell"],["valid-palindrome","Valid Palindrome"],["3sum","3Sum"],["container-with-most-water","Container Water"]],
+            exit: "Two pointers vs hash map — when each?"
+          },
+          {
+            day: 5, title: "Sliding Window + HashMap (Java)", track: "dsa",
+            java: "HashMap merge(), getOrDefault(). charAt() for strings. All solutions in Java.",
+            learn: "Fixed + variable sliding window. Frequency map patterns.",
+            drill: "Variable window pseudocode from memory",
+            problems: [["longest-substring-without-repeating-characters","Longest Substring"],["minimum-size-subarray-sum","Min Subarray Sum"],["subarray-sum-equals-k","Subarray Sum Equals K"],["product-of-array-except-self","Product Except Self"]],
+            exit: "Sliding window template automatic"
+          },
+          {
+            day: 6, title: "Week 1 Mock + Java Quiz", track: "mix",
+            learn: "Timed interview communication practice",
+            drill: "Mock 90 min: 3Sum + Longest Substring (talk aloud). Self-quiz: 10 Java OOP + collections questions.",
+            problems: [["3sum","3Sum"],["longest-substring-without-repeating-characters","Longest Substring"]],
+            exit: "Review all Week 1 mistakes in log"
+          },
+          {
+            day: 7, title: "SQL + JDBC (Java)", track: "sql",
+            java: "JDBC basics: Class.forName(driver), Connection, Statement. LeetCode SQL for query practice.",
+            sql: "SELECT, WHERE, ORDER BY, LIMIT. DDL vs DML. Primary key, foreign key.",
+            dbms: "What is DBMS vs DB? Relational model overview. Tables, rows, columns, schema.",
+            learn: "Light collections review — HashSet via HashMap",
+            drill: "30 min: 3 easy SQL on LeetCode. Re-solve 2 weakest DSA from Week 1.",
+            sqlProblems: [["combine-two-tables","Combine Two Tables"],["recyclable-and-low-fat-products","Recyclable Products"],["customers-who-never-order","Customers Never Order"]],
+            problems: [],
+            exit: "Week 1: ~25 LC DSA + 3 SQL done"
+          }
+        ]
+      },
+      {
+        id: "week2", title: "Week 2 — DSA in Java I", phase: "Days 8–14 · ListNode · ArrayDeque · Java OAs",
+        days: [
+          {
+            day: 8, title: "Linked List (Java ListNode)", track: "dsa",
+            java: "Use LeetCode ListNode class. Dummy head: ListNode dummy = new ListNode(0). Fast/slow pointers.",
+            learn: "Dummy node, fast/slow pointer",
+            drill: "Sketch reverse LL on paper",
+            problems: [["reverse-linked-list","Reverse LL"],["merge-two-sorted-lists","Merge Two Lists"],["linked-list-cycle","LL Cycle"],["middle-of-the-linked-list","Middle of LL"],["remove-nth-node-from-end-of-list","Remove Nth Node"]],
+            exit: "Fast/slow pointer use cases"
+          },
+          {
+            day: 9, title: "Linked List Advanced (Java)", track: "dsa",
+            java: "Pointer manipulation in Java — no garbage collection issues if you break links carefully.",
+            learn: "Complex pointer manipulation",
+            drill: "No streams — ListNode loops only",
+            problems: [["reorder-list","Reorder List"],["add-two-numbers","Add Two Numbers"],["copy-list-with-random-pointer","Copy Random Pointer"],["intersection-of-two-linked-lists","Intersection"],["palindrome-linked-list","Palindrome LL"]],
+            exit: null
+          },
+          {
+            day: 10, title: "Stack — ArrayDeque (Java)", track: "dsa",
+            java: "Deque<Integer> stack = new ArrayDeque<>(); push/pop. Never use legacy Stack class.",
+            learn: "ArrayDeque as stack; monotonic increasing/decreasing",
+            drill: null,
+            problems: [["valid-parentheses","Valid Parentheses"],["min-stack","Min Stack"],["daily-temperatures","Daily Temperatures"],["next-greater-element-i","Next Greater I"],["largest-rectangle-in-histogram","Largest Rectangle"]],
+            exit: "Monotonic stack trigger phrases"
+          },
+          {
+            day: 11, title: "Queue + BFS (Java)", track: "dsa",
+            java: "Queue<TreeNode> q = new ArrayDeque<>(); offer/poll. BFS level-order template in Java.",
+            learn: "ArrayDeque as queue, level-order preview",
+            drill: null,
+            problems: [["implement-queue-using-stacks","Queue using Stacks"],["number-of-recent-calls","Recent Calls"],["diameter-of-binary-tree","Diameter of Tree"],["rotting-oranges","Rotting Oranges"],["perfect-squares","Perfect Squares"]],
+            exit: null
+          },
+          {
+            day: 12, title: "Binary Search (Java)", track: "dsa",
+            java: "int mid = lo + (hi - lo) / 2; avoid overflow. Arrays.binarySearch for sorted arrays.",
+            learn: "lo < hi, lo <= hi, lower/upper bound",
+            drill: "Write 3 BS templates from memory",
+            problems: [["binary-search","Binary Search"],["search-insert-position","Search Insert"],["find-minimum-in-rotated-sorted-array","Min Rotated Array"],["search-in-rotated-sorted-array","Search Rotated"],["koko-eating-bananas","Koko Eating Bananas"]],
+            exit: "BS templates automatic"
+          },
+          {
+            day: 13, title: "Binary Search on Answer (Java)", track: "dsa",
+            java: "Classic Java while (lo < hi) template. All solutions submitted as Java class.",
+            learn: "Search the answer space, not the array",
+            drill: "Mock 60 min: 1 LL Medium + 1 BS problem",
+            problems: [["capacity-to-ship-packages-within-d-days","Ship Packages"],["split-array-largest-sum","Split Array Sum"],["median-of-two-sorted-arrays","Median Two Arrays"],["find-peak-element","Find Peak Element"]],
+            exit: "Identify BS-on-answer problems"
+          },
+          {
+            day: 14, title: "SQL + JDBC Intro", track: "sql",
+            java: "JDBC: DriverManager.getConnection(), PreparedStatement, ResultSet. Connect Java app to MySQL/Postgres.",
+            sql: "INNER JOIN, LEFT JOIN, GROUP BY, HAVING. LeetCode SQL tab (language-agnostic queries).",
+            dbms: "Entity-Relationship (ER) diagram basics. One-to-many, many-to-many (junction table).",
+            learn: "Deque vs Stack — when to use ArrayDeque",
+            drill: "60 min SQL: 5 problems on JOINs + GROUP BY. Re-solve 2 LL problems blind.",
+            sqlProblems: [["employees-earning-more-than-their-managers","Employees > Manager"],["department-highest-salary","Dept Highest Salary"],["duplicate-emails","Duplicate Emails"],["not-boring-movies","Not Boring Movies"],["project-employees-i","Project Employees I"]],
+            problems: [["reverse-linked-list","Reverse LL"],["valid-parentheses","Valid Parentheses"]],
+            exit: "Week 2: ~70 DSA + 8 SQL cumulative"
+          }
+        ]
+      },
+      {
+        id: "week3", title: "Week 3 — Trees & Graphs in Java", phase: "Days 15–21 · TreeNode · HashMap adjacency",
+        days: [
+          {
+            day: 15, title: "Tree DFS (Java Recursion)", track: "dsa",
+            java: "void dfs(TreeNode node) — recursive DFS. Java recursion uses call stack — depth = tree height.",
+            learn: "Pre/in/post order, recursion return values",
+            drill: null,
+            problems: [["maximum-depth-of-binary-tree","Max Depth"],["same-tree","Same Tree"],["invert-binary-tree","Invert Tree"],["path-sum","Path Sum"],["diameter-of-binary-tree","Diameter"]],
+            exit: null
+          },
+          {
+            day: 16, title: "Tree BFS",
+            learn: "Queue<TreeNode>, level tracking",
+            drill: null,
+            problems: [["binary-tree-level-order-traversal","Level Order"],["binary-tree-right-side-view","Right Side View"],["binary-tree-zigzag-level-order-traversal","Zigzag"],["binary-tree-minimum-depth","Min Depth"],["populating-next-right-pointers-in-each-node","Next Pointers"]],
+            exit: null
+          },
+          {
+            day: 17, title: "BST",
+            learn: "BST invariant, inorder = sorted",
+            drill: null,
+            problems: [["validate-binary-search-tree","Validate BST"],["kth-smallest-element-in-a-bst","Kth Smallest BST"],["lowest-common-ancestor-of-a-binary-search-tree","LCA BST"],["insert-into-a-binary-search-tree","Insert BST"],["delete-node-in-a-bst","Delete Node BST"]],
+            exit: null
+          },
+          {
+            day: 18, title: "Graph BFS/DFS",
+            learn: "Map<Integer,List<Integer>> adjacency list, visited[]",
+            drill: null,
+            problems: [["number-of-islands","Number of Islands"],["clone-graph","Clone Graph"],["max-area-of-island","Max Area Island"],["pacific-atlantic-water-flow","Pacific Atlantic"],["surrounded-regions","Surrounded Regions"]],
+            exit: null
+          },
+          {
+            day: 19, title: "Topo Sort + Union-Find",
+            learn: "Kahn's algorithm, UF template",
+            drill: "Implement Union-Find class in Java",
+            problems: [["course-schedule","Course Schedule"],["course-schedule-ii","Course Schedule II"],["redundant-connection","Redundant Connection"],["number-of-connected-components-in-an-undirected-graph","Connected Components"],["graph-valid-tree","Graph Valid Tree"]],
+            exit: "Union-Find from memory"
+          },
+          {
+            day: 20, title: "Graph Medium Mix",
+            learn: "Multi-source BFS, path reconstruction",
+            drill: null,
+            problems: [["word-ladder","Word Ladder"],["network-delay-time","Network Delay"],["cheapest-flights-within-k-stops","Cheapest Flights"],["accounts-merge","Accounts Merge"]],
+            exit: null
+          },
+          {
+            day: 21, title: "Mock DSA + DBMS Indexing", track: "mix",
+            dbms: "B+ Tree index structure. Clustered vs non-clustered index. When to index (WHERE, JOIN, ORDER BY). EXPLAIN query plan. Covering index.",
+            sql: "Review JOIN + GROUP BY. Solve 2 medium SQL.",
+            learn: "Connect indexing to FAANG SD — read replicas + cache",
+            drill: "Mock 60 min: Number of Islands + LCA BST. 30 min SQL.",
+            sqlProblems: [["second-highest-salary","Second Highest Salary"],["nth-highest-salary","Nth Highest Salary"]],
+            problems: [["number-of-islands","Number of Islands"],["lowest-common-ancestor-of-a-binary-search-tree","LCA BST"]],
+            exit: "Week 3: ~115 DSA + explain indexing on paper"
+          }
+        ]
+      },
+      {
+        id: "week4", title: "Week 4 — DP & Backtracking in Java", phase: "Days 22–28 · int[] dp · ArrayList path",
+        days: [
+          {
+            day: 22, title: "1D DP (Java int[])", track: "dsa",
+            java: "int[] dp = new int[n + 1]. Bottom-up loops in Java — no memo map needed for 1D.",
+            learn: "State, transition, base case",
+            drill: null,
+            problems: [["climbing-stairs","Climbing Stairs"],["house-robber","House Robber"],["house-robber-ii","House Robber II"],["min-cost-climbing-stairs","Min Cost Stairs"],["decode-ways","Decode Ways"]],
+            exit: "State transition on paper before code"
+          },
+          {
+            day: 23, title: "DP Sequences & Knapsack",
+            learn: "Coin change, LIS, subset sum",
+            drill: null,
+            problems: [["coin-change","Coin Change"],["longest-increasing-subsequence","LIS"],["word-break","Word Break"],["partition-equal-subset-sum","Partition Equal Subset"],["maximum-subarray","Maximum Subarray"]],
+            exit: null
+          },
+          {
+            day: 24, title: "2D Dynamic Programming",
+            learn: "Grid DP, two-sequence DP",
+            drill: null,
+            problems: [["unique-paths","Unique Paths"],["minimum-path-sum","Min Path Sum"],["longest-common-subsequence","LCS"],["edit-distance","Edit Distance"],["interleaving-string","Interleaving String"]],
+            exit: null
+          },
+          {
+            day: 25, title: "Backtracking",
+            learn: "Choose → explore → unchoose",
+            drill: null,
+            problems: [["subsets","Subsets"],["subsets-ii","Subsets II"],["combination-sum","Combination Sum"],["permutations","Permutations"],["combination-sum-ii","Combination Sum II"]],
+            exit: "Backtrack template from memory"
+          },
+          {
+            day: 26, title: "Backtracking II",
+            learn: "Pruning, duplicate handling",
+            drill: "Draw recursion tree for Subsets",
+            problems: [["n-queens","N-Queens"],["word-search","Word Search"],["palindrome-partitioning","Palindrome Partition"],["letter-combinations-of-a-phone-number","Letter Combinations"]],
+            exit: null
+          },
+          {
+            day: 27, title: "Heap & Priority Queue",
+            learn: "Min/max heap, top-K, custom comparators",
+            drill: "PriorityQueue, Comparator.comparingInt",
+            problems: [["kth-largest-element-in-an-array","Kth Largest"],["top-k-frequent-elements","Top K Frequent"],["merge-k-sorted-lists","Merge K Lists"],["find-k-pairs-with-smallest-sums","K Pairs Smallest"],["task-scheduler","Task Scheduler"]],
+            exit: null
+          },
+          {
+            day: 28, title: "Greedy + DBMS Transactions", track: "mix",
+            dbms: "ACID properties deep dive. Isolation levels: READ COMMITTED, REPEATABLE READ, SERIALIZABLE. Dirty read, phantom read. MVCC overview.",
+            sql: "Window functions intro: ROW_NUMBER, RANK, DENSE_RANK, PARTITION BY.",
+            learn: "Interval greedy patterns",
+            drill: "Mock: Merge Intervals + Coin Change. 3 SQL with window functions.",
+            sqlProblems: [["rank-scores","Rank Scores"],["consecutive-numbers","Consecutive Numbers"],["rising-temperature","Rising Temperature"]],
+            problems: [["jump-game","Jump Game"],["merge-intervals","Merge Intervals"],["coin-change","Coin Change"]],
+            exit: "Week 4: ~155 DSA + ACID explained with examples"
+          }
+        ]
+      },
+      {
+        id: "week5", title: "Week 5 — Java Expert + Spring + SQL", phase: "Days 29–35 · Concurrency · JDBC/JPA · Spring Boot",
+        days: [
+          {
+            day: 29, title: "HashMap Internals + equals/hashCode", track: "java",
+            java: "Buckets, load factor 0.75, treeify at 8, resize. Override equals/hashCode for custom keys.",
+            learn: "Implement mini MyHashMap with chaining",
+            drill: "Explain put() on paper step-by-step. Break a HashMap with mutable key.",
+            problems: [["design-hashmap","Design HashMap"],["longest-consecutive-sequence","Longest Consecutive"]],
+            exit: "HashMap internals + equals/hashCode contract"
+          },
+          {
+            day: 30, title: "Java Concurrency Basics", track: "java",
+            java: "Threads, Runnable, synchronized, volatile. ExecutorService, thread pools. ConcurrentHashMap vs HashMap.",
+            learn: "Why thread safety matters in distributed systems (SD link)",
+            drill: "Write producer-consumer with BlockingQueue. Read ConcurrentHashMap docs.",
+            problems: [["print-foobar-alternately","Print FooBar"],["print-in-order","Print in Order"]],
+            exit: "Explain synchronized vs ConcurrentHashMap"
+          },
+          {
+            day: 31, title: "LRU / LFU + Design Twitter", track: "mix",
+            java: "LinkedHashMap accessOrder for LRU. Manual HashMap + doubly linked list.",
+            learn: "LC design problems bridge DSA → SD",
+            drill: "Implement LRU Cache both ways in 25 min",
+            problems: [["lru-cache","LRU Cache"],["lfu-cache","LFU Cache"],["design-twitter","Design Twitter"]],
+            exit: "LRU cold in 25 min"
+          },
+          {
+            day: 32, title: "Spring Boot + CompletableFuture", track: "java",
+            java: "Spring Boot: @RestController, @Service, @Repository, @Autowired. REST API with ResponseEntity. CompletableFuture supplyAsync, thenApply.",
+            learn: "Build mini REST API: GET /users, POST /users with in-memory HashMap store.",
+            drill: "Create UserController + UserService in Java. Chain 3 CompletableFuture tasks.",
+            problems: [["sort-characters-by-frequency","Sort Chars Frequency"],["relative-sort-array","Relative Sort Array"]],
+            exit: "Streams for cleanup; CompletableFuture overview"
+          },
+          {
+            day: 33, title: "Trie + Bit Manipulation", track: "dsa",
+            learn: "Trie for prefix search. XOR bit tricks. Connects to SD autocomplete.",
+            drill: "Implement Trie from memory. Draw Trie for \"cat\",\"car\",\"card\".",
+            problems: [["implement-trie-prefix-tree","Implement Trie"],["word-search-ii","Word Search II"],["single-number","Single Number"]],
+            exit: "Trie + link to Search Autocomplete SD case"
+          },
+          {
+            day: 34, title: "DBMS + SQL Mastery Day", track: "sql",
+            dbms: "Normalization 1NF–3NF + denormalization trade-offs. SQL vs NoSQL (Postgres vs DynamoDB). JDBC + PreparedStatement (SQL injection prevention). JPA/Hibernate overview.",
+            sql: "Full sprint: subqueries, CTEs (WITH), LEAD/LAG, UNION. Read #dbms-sql section.",
+            learn: "Connect DB schema design to Week 6 FAANG SD cases",
+            drill: "90 min SQL marathon: 10 LeetCode SQL problems timed (15 min each for medium).",
+            sqlProblems: [["department-top-three-salaries","Dept Top 3 Salaries"],["department-highest-salary","Dept Highest Salary"],["article-views-i","Article Views I"],["monthly-transactions-i","Monthly Transactions I"],["immediate-food-delivery","Immediate Food Delivery"],["game-play-analysis-i","Game Play Analysis I"],["customer-placing-the-largest-number-of-orders","Customer Most Orders"],["big-countries","Big Countries"],["swap-salary","Swap Salary"],["rearrange-products-table","Rearrange Products"]],
+            problems: [],
+            exit: "25+ total SQL solved · all 8 SQL patterns from #dbms-sql"
+          },
+          {
+            day: 35, title: "Week 5 Mock — Java + DSA", track: "mix",
+            learn: "Collections + concurrency quiz",
+            drill: "Mock 90 min: LRU Cache implement + Word Break + explain HashMap internals aloud",
+            problems: [["word-break","Word Break"],["lru-cache","LRU Cache"]],
+            exit: "Week 5 target: ~200 LC cumulative"
+          }
+        ]
+      },
+      {
+        id: "week6", title: "Week 6 — FAANG SD (Java Backend)", phase: "Days 36–42 · Spring Boot microservices + schema design",
+        days: [
+          {
+            day: 36, title: "SD Foundations + Database Design", track: "sd", faang: "All FAANG",
+            sd: "CAP, load balancing, caching, sharding. HLD framework: Requirements → Estimate → API → Data model → Diagram → Deep dive.",
+            dbms: "Schema design for SD: choose PK/shard key, indexes, read replicas, connection pooling. SQL (Postgres) vs NoSQL (DynamoDB/Cassandra) decision matrix.",
+            learn: "Every FAANG SD answer needs a data model + storage justification",
+            drill: "Design schema for Twitter Feed: users, tweets, follows, timeline. Add indexes. Estimate storage.",
+            problems: [],
+            exit: "Draw ER diagram + justify SQL vs NoSQL for 2 FAANG products"
+          },
+          {
+            day: 37, title: "Google — Search & Autocomplete", track: "sd", faang: "Google",
+            sd: "Inverted index, crawlers, PageRank overview, typeahead with Trie + Elasticsearch, spell correction, billions of queries/day scale.",
+            learn: "Connect DSA Trie (Day 33) to Google SD",
+            drill: "45 min mock: Design Google Search autocomplete for 5B queries/day.",
+            problems: [["implement-trie-prefix-tree","Implement Trie"],["word-search-ii","Word Search II"]],
+            exit: "Search index + autocomplete diagram cold"
+          },
+          {
+            day: 38, title: "Meta — News Feed & Instagram", track: "sd", faang: "Meta",
+            sd: "Fan-out on write vs read, celebrity problem, ranking pipeline, photo CDN, Stories vs Feed storage, Graph API.",
+            learn: "Push vs pull — when each wins at Meta scale",
+            drill: "45 min: Design Instagram Feed for 2B users. Deep dive fan-out.",
+            problems: [["design-twitter","Design Twitter"]],
+            exit: "News Feed fan-out strategy explained with trade-offs"
+          },
+          {
+            day: 39, title: "Amazon — Checkout & Product Catalog", track: "sd", faang: "Amazon",
+            sd: "Product catalog (DynamoDB), cart service, inventory consistency, order pipeline, SQS/SNS events, peak traffic (Prime Day).",
+            learn: "AWS services in SD answers: DynamoDB, SQS, ElastiCache, CloudFront",
+            drill: "45 min: Design Amazon checkout flow. Handle inventory race conditions.",
+            problems: [["lru-cache","LRU Cache"]],
+            exit: "Order pipeline + inventory consistency approach"
+          },
+          {
+            day: 40, title: "Netflix — Video Streaming", track: "sd", faang: "Netflix",
+            sd: "Upload → transcode (multiple bitrates) → S3 → CDN → adaptive bitrate playback. Recommendation pipeline. Chaos engineering / HA.",
+            learn: "Read Netflix tech blog: Zuul, EVCache, Chaos Monkey",
+            drill: "45 min: Design Netflix video streaming for 200M subscribers.",
+            problems: [],
+            exit: "Upload-to-playback pipeline + CDN placement"
+          },
+          {
+            day: 41, title: "Apple — iCloud & Photo Sync", track: "sd", faang: "Apple",
+            sd: "Photo upload, metadata sync across devices, conflict resolution, privacy (E2E encryption overview), blob storage, delta sync.",
+            learn: "Privacy-by-design as Apple SD differentiator",
+            drill: "45 min: Design iCloud photo sync for 1B devices. Emphasize privacy.",
+            problems: [],
+            exit: "Sync + conflict resolution + privacy talking points"
+          },
+          {
+            day: 42, title: "Universal — URL Shortener + Rate Limiter", track: "sd", faang: "All FAANG",
+            sd: "URL Shortener (asked everywhere). Rate limiter (token bucket in Redis). Consistent hashing for cache nodes.",
+            learn: "These two appear across Google, Meta, Amazon OAs/onsites",
+            drill: "30 min URL Shortener + 30 min Rate Limiter — timed, talk aloud.",
+            problems: [],
+            exit: "Week 6: 6 FAANG SD cases + 2 universal designs"
+          }
+        ]
+      },
+      {
+        id: "week7", title: "Week 7 — FAANG Company Sprint", phase: "Days 43–49 · One company per day",
+        days: [
+          {
+            day: 43, title: "Meta Sprint Day", track: "mix", faang: "Meta",
+            sd: "45 min mock: Design Facebook Messenger or WhatsApp at Meta scale.",
+            learn: "Meta patterns: graphs, BFS, topological sort, backtracking",
+            drill: "90 min: 1 SD (Messenger) + 2 LC Medium blind: Clone Graph + Course Schedule",
+            problems: [["clone-graph","Clone Graph"],["course-schedule","Course Schedule"],["accounts-merge","Accounts Merge"]],
+            exit: "Meta must-do 12: 6+ solved blind"
+          },
+          {
+            day: 44, title: "Amazon Sprint Day", track: "mix", faang: "Amazon",
+            sd: "Write 4 STAR stories: Customer Obsession, Ownership, Bias for Action, Dive Deep.",
+            learn: "Amazon LP = 50% of loop score",
+            drill: "90 min: LP mock (30m) + 2 coding: LRU Cache implement + Word Ladder",
+            problems: [["lru-cache","LRU Cache"],["word-ladder","Word Ladder"],["top-k-frequent-elements","Top K Frequent"]],
+            exit: "8 LP STAR stories ready"
+          },
+          {
+            day: 45, title: "Apple Sprint Day", track: "mix", faang: "Apple",
+            java: "OOP drill: design Parking Lot in Java — interfaces, immutability, clean naming.",
+            learn: "Apple: readable production code > clever algorithms",
+            drill: "60 min OOP design + 2 LC: Reverse LL + Valid Parentheses (explain every line)",
+            problems: [["reverse-linked-list","Reverse LL"],["valid-parentheses","Valid Parentheses"],["merge-two-sorted-lists","Merge Two Lists"]],
+            exit: "Parking Lot class diagram + Java skeleton from memory"
+          },
+          {
+            day: 46, title: "Netflix Sprint Day", track: "mix", faang: "Netflix",
+            sd: "45 min: Design Netflix recommendation system or A/B testing infra.",
+            java: "Concurrency: explain ExecutorService + CompletableFuture with examples.",
+            drill: "SD mock + 2 LC: Task Scheduler + Merge Intervals",
+            problems: [["task-scheduler","Task Scheduler"],["merge-intervals","Merge Intervals"],["rotting-oranges","Rotting Oranges"]],
+            exit: "Netflix culture stories + microservices SD ready"
+          },
+          {
+            day: 47, title: "Google Sprint Day", track: "mix", faang: "Google",
+            learn: "Google hardest patterns: DP, graphs, binary search on answer",
+            drill: "40 min each, solo then editorial: Word Ladder + Edit Distance + Merge K Lists",
+            problems: [["word-ladder","Word Ladder"],["edit-distance","Edit Distance"],["merge-k-sorted-lists","Merge K Lists"],["alien-dictionary","Alien Dictionary"]],
+            exit: "Google must-do 12: tackle 3 Hard or deep-study"
+          },
+          {
+            day: 48, title: "FAANG OA Marathon", track: "dsa", faang: "All FAANG",
+            learn: "Simulate real OA conditions — no hints, strict timer",
+            drill: "2 hours: 3 Medium problems back-to-back (25+25+35 min). Meta/Amazon/Google OA format.",
+            problems: [["longest-substring-without-repeating-characters","Longest Substring"],["number-of-islands","Number of Islands"],["coin-change","Coin Change"]],
+            exit: "2/3 OA problems solved optimally under time pressure"
+          },
+          {
+            day: 49, title: "FAANG Weak-Area + SQL Review", track: "mix", faang: "All FAANG",
+            sql: "Re-solve 5 hardest SQL blind. Review ACID, indexing, normalization flashcards.",
+            dbms: "Redraw 3 SD schemas from memory (Feed, Checkout, Streaming). SQL vs NoSQL trade-offs.",
+            learn: "Review company must-do lists in #companies — find gaps",
+            drill: "10 DSA re-solves + 5 SQL re-solves + 3 SD diagrams from memory.",
+            sqlProblems: [["second-highest-salary","Second Highest Salary"],["department-top-three-salaries","Dept Top 3"],["rank-scores","Rank Scores"],["consecutive-numbers","Consecutive Numbers"],["nth-highest-salary","Nth Highest Salary"]],
+            problems: [],
+            exit: "20 DSA + 10 SD + 25 SQL flashcards logged"
+          }
+        ]
+      },
+      {
+        id: "week8", title: "Week 8 — FAANG Graduation", phase: "Day 50 · Full loop simulation",
+        days: [
+          {
+            day: 50, title: "FAANG Graduation — Full Loop Mock", track: "mix", faang: "All FAANG",
+            java: "Explain HashMap internals + JDBC PreparedStatement in 5 min aloud.",
+            sql: "15 min: Second Highest Salary + Department Top 3 Salaries — blind.",
+            dbms: "5 min: ACID + indexing + when SQL vs NoSQL — no notes.",
+            sd: "45 min cold SD — pick random: News Feed (Meta) / Search (Google) / Streaming (Netflix). Include schema + indexes.",
+            learn: "You are ready for FAANG L3/E3/SDE1 level interviews.",
+            drill: "3-hour FAANG loop: (1) LC Medium — 25m (2) SQL Medium — 15m (3) SD + schema — 45m (4) Behavioral — 20m (5) DBMS oral — 10m (6) Self-grade",
+            problems: [["binary-tree-maximum-path-sum","Max Path Sum"],["minimum-window-substring","Min Window Substring"]],
+            exit: "Day 50 FAANG checklist in #reference — apply to all 5 companies 🎯"
+          }
+        ]
+      }
+    ];
+
+    function renderPlan() {
+      const container = document.getElementById("plan");
+      let html = "";
+
+      plan.forEach(week => {
+        html += `<section id="${week.id}">
+          <div class="week-header">
+            <h2>${week.title}</h2>
+            <span class="phase-tag">${week.phase}</span>
+          </div>`;
+
+        week.days.forEach(d => {
+          const id = `day-${d.day}`;
+          const track = d.track || "dsa";
+          const trackClass = track === "java" ? "track-java" : track === "sd" ? "track-sd" : track === "sql" ? "track-sql" : track === "mix" ? "track-mix" : "track-dsa";
+          const trackLabel = track === "java" ? "Java" : track === "sd" ? "SD" : track === "sql" ? "SQL" : track === "mix" ? "Mix" : "DSA";
+          html += `<div class="day-card" id="card-${d.day}" data-day="${d.day}">
+            <div class="day-header" onclick="toggleDay(${d.day})">
+              <input type="checkbox" class="day-check" id="${id}" data-day="${d.day}" onclick="event.stopPropagation(); toggleDone(${d.day})" />
+              <span class="day-num">Day ${d.day}</span>
+              <span class="day-title">${d.title}</span>
+              <span class="track-badge ${trackClass}">${trackLabel}</span>
+              ${d.faang ? `<span class="track-badge track-faang">${d.faang}</span>` : ""}
+              <span class="chevron">▼</span>
+            </div>
+            <div class="day-body">`;
+
+          if (d.dbms) {
+            html += `<div class="block"><div class="block-label dbms">DBMS</div><p>${d.dbms}</p></div>`;
+          }
+          if (d.sql) {
+            html += `<div class="block"><div class="block-label sql">SQL</div><p>${d.sql}</p></div>`;
+          }
+          if (d.java) {
+            html += `<div class="block"><div class="block-label java">Java</div><p>${d.java}</p></div>`;
+          }
+          if (d.sd) {
+            html += `<div class="block"><div class="block-label sd">System Design</div><p>${d.sd}</p></div>`;
+          }
+          if (d.learn) {
+            html += `<div class="block"><div class="block-label learn">Learn</div><p>${d.learn}</p></div>`;
+          }
+          if (d.drill) {
+            html += `<div class="block"><div class="block-label drill">Drill / Mock</div><p>${d.drill}</p></div>`;
+          }
+          if (d.problems && d.problems.length) {
+            html += `<div class="block"><div class="block-label solve">Solve (DSA)</div><div class="problems">`;
+            d.problems.forEach(([slug, name]) => {
+              html += `<a class="problem" href="${lc(slug)}" target="_blank" rel="noopener">${name}</a>`;
+            });
+            html += `</div></div>`;
+          }
+          if (d.sqlProblems && d.sqlProblems.length) {
+            html += `<div class="block"><div class="block-label sql">SQL Practice (LeetCode)</div><div class="problems">`;
+            d.sqlProblems.forEach(([slug, name]) => {
+              html += `<a class="problem sql-link" href="${lcs(slug)}" target="_blank" rel="noopener">${name}</a>`;
+            });
+            html += `</div></div>`;
+          }
+          if (d.exit) {
+            html += `<div class="block"><div class="block-label exit">Exit Criteria</div><p>${d.exit}</p></div>`;
+          }
+
+          html += `</div></div>`;
+        });
+
+        html += `</section>`;
+      });
+
+      html += renderCompaniesSection();
+      html += renderJavaStackSection();
+      html += renderPatternsSection();
+      html += renderSystemDesignPatternsSection();
+      html += renderDbmsSqlSection();
+      html += renderInterviewSection();
+      html += renderReferenceSection();
+
+      container.innerHTML = html;
+    }
+
+    function getProgress() {
+      try { return JSON.parse(localStorage.getItem(STORAGE_KEY)) || {}; }
+      catch { return {}; }
+    }
+
+    function saveProgress(data) {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+    }
+
+    function toggleDone(day) {
+      const progress = getProgress();
+      const cb = document.getElementById(`day-${day}`);
+      progress[day] = cb.checked;
+      saveProgress(progress);
+      updateUI();
+    }
+
+    function toggleDay(day) {
+      document.getElementById(`card-${day}`).classList.toggle("open");
+    }
+
+    function expandAll() {
+      document.querySelectorAll(".day-card, .pattern-card, .company-card, .iq-card").forEach(c => c.classList.add("open"));
+    }
+
+    function collapseAll() {
+      document.querySelectorAll(".day-card, .pattern-card, .company-card, .iq-card").forEach(c => c.classList.remove("open"));
+    }
+
+    function resetProgress() {
+      if (!confirm("Reset all checkboxes? This cannot be undone.")) return;
+      localStorage.removeItem(STORAGE_KEY);
+      document.querySelectorAll(".day-check").forEach(cb => { cb.checked = false; });
+      updateUI();
+    }
+
+    function updateUI() {
+      const progress = getProgress();
+      let done = 0;
+
+      for (let d = 1; d <= TOTAL_DAYS; d++) {
+        const cb = document.getElementById(`day-${d}`);
+        const card = document.getElementById(`card-${d}`);
+        if (!cb) continue;
+        cb.checked = !!progress[d];
+        if (progress[d]) {
+          done++;
+          card?.classList.add("done");
+        } else {
+          card?.classList.remove("done");
+        }
+      }
+
+      const pct = Math.round((done / TOTAL_DAYS) * 100);
+      document.getElementById("daysDone").textContent = done;
+      document.getElementById("progressFill").style.width = pct + "%";
+      document.getElementById("progressPct").textContent = pct + "%";
+
+      const weekRanges = [[1,7,"wb1"],[8,14,"wb2"],[15,21,"wb3"],[22,28,"wb4"],[29,35,"wb5"],[36,42,"wb6"],[43,49,"wb7"],[50,50,"wb8"]];
+      weekRanges.forEach(([start, end, badgeId]) => {
+        let wDone = 0;
+        for (let d = start; d <= end; d++) if (progress[d]) wDone++;
+        const el = document.getElementById(badgeId);
+        if (el) el.textContent = `${wDone}/${end - start + 1}`;
+      });
+
+      const focusWeeks = [
+        [1, 7, "Week 1"],
+        [8, 14, "Week 2"],
+        [15, 21, "Week 3"],
+        [22, 28, "Week 4"],
+        [29, 35, "Week 5"],
+        [36, 42, "Week 6 — SD"],
+        [43, 49, "Week 7"],
+        [50, 50, "Complete!"]
+      ];
+      let cw = "Complete!";
+      for (let d = 1; d <= TOTAL_DAYS; d++) {
+        if (!progress[d]) {
+          cw = focusWeeks.find(([start, end]) => d >= start && d <= end)?.[2] ?? "Week 1";
+          break;
+        }
+      }
+      document.getElementById("currentWeek").textContent = cw;
+    }
+
+    function openMobileNav() {
+      document.getElementById("sidebar")?.classList.add("open");
+      document.getElementById("sidebarBackdrop")?.classList.add("open");
+      document.getElementById("navToggle")?.setAttribute("aria-expanded", "true");
+      document.body.classList.add("nav-open");
+    }
+
+    function closeMobileNav() {
+      document.getElementById("sidebar")?.classList.remove("open");
+      document.getElementById("sidebarBackdrop")?.classList.remove("open");
+      document.getElementById("navToggle")?.setAttribute("aria-expanded", "false");
+      document.body.classList.remove("nav-open");
+    }
+
+    function initMobileNav() {
+      const toggle = document.getElementById("navToggle");
+      const backdrop = document.getElementById("sidebarBackdrop");
+      if (!toggle) return;
+
+      toggle.addEventListener("click", () => {
+        const sidebar = document.getElementById("sidebar");
+        if (sidebar?.classList.contains("open")) closeMobileNav();
+        else openMobileNav();
+      });
+
+      backdrop?.addEventListener("click", closeMobileNav);
+
+      window.addEventListener("resize", () => {
+        if (window.innerWidth > 768) closeMobileNav();
+      });
+
+      document.addEventListener("keydown", (e) => {
+        if (e.key === "Escape") closeMobileNav();
+      });
+    }
+
+    document.querySelectorAll(".nav-link").forEach(link => {
+      link.addEventListener("click", () => {
+        document.querySelectorAll(".nav-link").forEach(l => l.classList.remove("active"));
+        link.classList.add("active");
+        if (window.innerWidth <= 768) closeMobileNav();
+      });
+    });
+
+    initMobileNav();
+    renderPlan();
+    updateUI();
+    document.getElementById("card-1")?.classList.add("open");
+  </script>
+</body>
+</html>
